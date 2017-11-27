@@ -1,29 +1,38 @@
-// README: The following govern chattermon's base game logic. 
-// 1) TYPES object: 
-//   holds all the types in the pokemon game and is referenced whenever a pokemon attacks. The attack command is always
-//   the same 'type' as the attacking pokemon's first type in its types array. The 'type' will do more or less dmg, or
-//   no damage at all, depending on the type of the opposing pokemon. 
-// 2) findRandomIV:
-//      a function that introduces a level of variability to an individual pokemon's stats, so that individual instances
-//      of a the same pokemon will not always have the same stats everytime they are instantiated.
-// 3) calculateBaseHealth:
-//      a function that generates the inital HP or health points of the pokemon
-// 4) calculateBaseStat:
-//      a function that is used to generate the pokemons attack and defense, used in damage calculation
-// 5) criticalChance:
-//      a function that will amplify the damage of any given attack with a 6.25% chance. Again, this 
-//      adds an element of luck to the game and introduces a bit more complexity.
-// 6) modifierCalculation: 
-//      a function that will produce a number based on the aforementioned functions and types object. 
-//      This function returns an object with two properties
-//       -a log statement, which is later shown to the user depending whether the attack does more or less damage as 
-//        determined by the attacking and opposing pokemons types and
-//       -the modifier number, which amplifies or dampens the amount the attack actually does, again, depending on the 
-//        attacking and opposing pokemons types.
-// 7) damageCalculation:
-//     a function that generates the damage to be done based on the algorithm used in the pokemon games.
-//     The number produced by this algorithm is multiplied by the modifier number to produce the actual damage to be
-//     to the opposing pokemon as seen by the user.
+/* ===== GAME LOGIC ================================================================================================
+The following govern chattermon's base game logic. 
+
+1) TYPES object: 
+  holds all the types in the pokemon game and is referenced whenever a pokemon attacks. The attack command is always
+  the same 'type' as the attacking pokemon's first type in its types array. The 'type' will do more or less dmg, or
+  no damage at all, depending on the type of the opposing pokemon. 
+===================================================================================================================
+2) findRandomIV:
+     a function that introduces a level of variability to an individual pokemon's stats, so that individual instances
+     of a the same pokemon will not always have the same stats everytime they are instantiated.
+===================================================================================================================
+3) calculateBaseHealth:
+     a function that generates the inital HP or health points of the pokemon
+===================================================================================================================
+4) calculateBaseStat:
+     a function that is used to generate the pokemon's attack and defense, used in damage calculation
+===================================================================================================================
+5) criticalChance:
+     a function that will amplify the damage of any given attack with a 6.25% chance. Again, this 
+     adds an element of luck to the game and introduces a bit more complexity.
+===================================================================================================================
+6) modifierCalculation: 
+     a function that will produce a number based on the aforementioned functions and types object. 
+     This function returns an object with two properties
+      - a log statement, which is later shown to the user depending whether the attack does more or less damage as 
+        determined by the attacking and opposing pokemons types and
+      - the modifier number, which amplifies or dampens the amount the attack actually does, again, depending on the 
+        attacking and opposing pokemons types.
+===================================================================================================================
+7) damageCalculation:
+    a function that generates the damage to be done based on the algorithm used in the pokemon games.
+    The number produced by this algorithm is multiplied by the modifier number to produce the actual damage to be
+    to the opposing pokemon as seen by the user.
+=================================================================================================================== */
 
 const TYPES = {
   normal: {

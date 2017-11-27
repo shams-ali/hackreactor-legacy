@@ -52,7 +52,7 @@ const fetchFirst151Pokemon = (callback, pokemonStoredSoFar) => {
 
 
 const checkForPokemon = (callback) => {
-  Pokemon.findAll({})
+  db.Pokemon.findAll({})
     .then((data) => {
       if (data.length < 151) {
         console.log('There are less than 151 pokemon in the DB!');
