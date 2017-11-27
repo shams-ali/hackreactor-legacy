@@ -25,6 +25,7 @@ export default class Game extends Component {
       pokemon: [],
       opponent: null,
       isActive: null,
+      attacking: false,
       gameOver: false,
       winner: null,
       chatInput: '',
@@ -92,9 +93,9 @@ export default class Game extends Component {
         } else {
           this.setState(prevState => {
             return {
-            pokemon: data.player2.pokemon,
-            opponent: data.player1,
-            isActive: !prevState.isActive
+              pokemon: data.player2.pokemon,
+              opponent: data.player1,
+              isActive: !prevState.isActive
             }
           })
         }
@@ -179,6 +180,9 @@ export default class Game extends Component {
           name: this.state.name,
           pokemon: this.state.pokemon
         });
+        this.setState({
+            attacking: false
+        });
       },
       choose: (pokemonToSwap) => {
         let isAvailable = false;
@@ -223,7 +227,10 @@ export default class Game extends Component {
         if (this.state.pokemon[0].health <= 0) {
           alert('you must choose a new pokemon, this one has fainted!');
         } else {
-          this.commandHandlers().attack(); 
+          this.setState({
+            attacking: true
+          })
+          setTimeout(() => this.commandHandlers().attack(), 300);  
         }
       } else if (value.split(' ')[0] === "choose") {
         this.commandHandlers().choose(value.split(' ')[1]); 
@@ -239,7 +246,7 @@ export default class Game extends Component {
   }
 
   renderGame() {
-    const { pokemon, opponent, winner, name } = this.state;
+    const { pokemon, opponent, winner, name, attacking } = this.state;
     if (!this.state.opponent) {
       return (
         <div className={css.loading}>
@@ -249,7 +256,7 @@ export default class Game extends Component {
     } else if (this.state.gameOver) {
       return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} />
     } else {
-      return <GameView opponent={opponent} pokemon={pokemon} />
+      return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />
     }
   }
 
