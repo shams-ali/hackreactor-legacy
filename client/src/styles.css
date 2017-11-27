@@ -336,3 +336,11 @@ body {
   display: flex;
   justify-content: space-between; 
 }
+
+.attackAnimation {
+  padding-left: 30px;
+}
+
+.attacked {
+  opacity: 0.3
+}

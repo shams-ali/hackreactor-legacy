@@ -8,10 +8,10 @@ const GameView = (props) => {
     <div className={css.battleField}>
       <div className={css.pokeView}>
         <PokemonStats stats={props.opponent.pokemon[0]} />
-        <Pokemon sprite={props.opponent.pokemon[0].sprites.front_default}/>
+        <Pokemon sprite={props.opponent.pokemon[0].sprites.front_default} type='opponent' attacked={props.attacked} attacking={null} />
       </div>
       <div className={css.pokeView}>
-        <Pokemon sprite={props.pokemon[0].sprites.back_default} />
+        <Pokemon sprite={props.pokemon[0].sprites.back_default} attacking={props.attacking} attacked={null} />
         <PokemonStats stats={props.pokemon[0]} />
       </div>
     </div>

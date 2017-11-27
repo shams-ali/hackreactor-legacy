@@ -1,9 +1,19 @@
 import React from 'react';
+import css from '../styles.css';
 
 const Pokemon = (props) => {
+  const classes = () => {
+    if (props.attacking) {
+      return css.attackAnimation;
+    } else if (props.attacked) {
+      return css.attacked;
+    } else {
+      return css.staticAnimation;
+    }
+  }
   return (
     <div>
-      <img src={props.sprite} style={{minWidth: '200px'}} alt="pikachu" />
+      <img className={classes()} src={props.sprite} style={{minWidth: '200px'}} alt="pikachu" />
     </div>
   )
 }
