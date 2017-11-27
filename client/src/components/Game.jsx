@@ -87,8 +87,7 @@ export default class Game extends Component {
             return {
               pokemon: data.player1.pokemon,
               opponent: data.player2,
-              isActive: !prevState.isActive,
-              attacked: false
+              isActive: !prevState.isActive
             }
           });
         } else {
@@ -96,8 +95,7 @@ export default class Game extends Component {
             return {
               pokemon: data.player2.pokemon,
               opponent: data.player1,
-              isActive: !prevState.isActive,
-              attacked: false
+              isActive: !prevState.isActive
             }
           })
         }
@@ -248,7 +246,7 @@ export default class Game extends Component {
   }
 
   renderGame() {
-    const { pokemon, opponent, winner, name, attacking, attacked } = this.state;
+    const { pokemon, opponent, winner, name, attacking } = this.state;
     if (!this.state.opponent) {
       return (
         <div className={css.loading}>
@@ -258,7 +256,7 @@ export default class Game extends Component {
     } else if (this.state.gameOver) {
       return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} />
     } else {
-      return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} attacked={attacked} />
+      return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />
     }
   }
 

@@ -5,8 +5,6 @@ const Pokemon = (props) => {
   const classes = () => {
     if (props.attacking) {
       return css.attackAnimation;
-    } else if (props.attacked) {
-      return css.attacked;
     } else {
       return css.staticAnimation;
     }
