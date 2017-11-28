@@ -41,7 +41,7 @@ const Pokemon = sequelize.define('pokerito', {
     type: Sequelize.INTEGER,
     primaryKey: true,
     unique: true
-  },  
+  },
   name: Sequelize.STRING,
   types: Sequelize.ARRAY(Sequelize.TEXT),
   baseHealth: Sequelize.INTEGER,
@@ -54,6 +54,18 @@ const Pokemon = sequelize.define('pokerito', {
     timestamps: false
 });
 
+const WinLoss = sequelize.define('winlossito', {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    unique: true
+  },
+  gameDate: Sequelize.DATE,
+  winner_id: Sequelize.INTEGER,
+  winner_pokemon: Sequelize.Array(Sequelize.INTEGER),
+  loser_id: Sequelize.INTEGER,
+  loser_pokemon: Sequelize.Array(Sequelize.INTEGER)
+});
 
 Users.sync();
 Pokemon.sync();
@@ -74,7 +86,7 @@ const saveUser = (username, password, email) =>  {
     })
     .then(userFoundOrUsernameExists => {
       if (userFoundOrUsernameExists) {
-        return userFoundOrUsernameExists === 'Username Already Exists'  ? 
+        return userFoundOrUsernameExists === 'Username Already Exists'  ?
         'Username Already Exists':
         'Email Already Exists';
       }
