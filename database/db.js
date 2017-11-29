@@ -60,9 +60,9 @@ const WinLoss = sequelize.define('winlossito', {
   },
   gameDate: Sequelize.DATE,
   winner_id: Sequelize.INTEGER,
-  winner_pokemon: Sequelize.Array(Sequelize.INTEGER),
+  winner_pokemon: Sequelize.ARRAY(Sequelize.INTEGER),
   loser_id: Sequelize.INTEGER,
-  loser_pokemon: Sequelize.Array(Sequelize.INTEGER)
+  loser_pokemon: Sequelize.ARRAY(Sequelize.INTEGER)
 });
 
 Users.sync();
