@@ -266,7 +266,7 @@ passport.deserializeUser(function(user, done) {
 
 app.get('/user', (req, resp) => {
   resp.end(JSON.stringify({
-    username: req.session.usrname,
+    username: req.session.username,
     loggedIn: req.session.loggedIn
   }));
 })
