@@ -13,7 +13,7 @@ import css from '../styles.css';
 
 import help from './../../../utils/helpers.js';
 
-// A helper function to return true if the source contains the target string
+// A helper function for terminal commands to return true if the source contains the target string
 const matcher = (target, source) => {
   // If there is at least 1 match in the whole script (case insensitive), then return true, else return false;
   return (source.match(new RegExp('\\' + target + '\\gi')).length > 0) ? true : false;
@@ -112,7 +112,7 @@ export default class Game extends Component {
           gameOver: true,
           isActive: false
         });
-        setTimeout(() => this.props.history.replace("/"), 20000);
+        setTimeout(() => this.props.history.replace('/'), 20000);
       }
     };
   }
