@@ -19,6 +19,7 @@ const passport = require('passport');
 const axios = require('axios');
 const { createPokemon, createTurnlog, createPlayer } = require('./helpers/creators.js'); 
 const { damageCalculation } = require('../game-logic.js');
+const Lobby = require('./helpers/Lobby');
 
 const dist = path.join(__dirname, '/../client/dist');
 
@@ -80,14 +81,13 @@ const games = {};
 
 /* =============================================================== */ 
 
-// Lobbies are created as more users join the server and exceed the room capacity
-// By default, room will be of size n X n and allow up to m users per room
+// Lobbies can be created as more users join the server and exceed the room capacity
 // Try to keep capacity even so everybody has someone to play with
-
-const lobbies = new Set();
-const ROOM_CAPACITY = process.env.ROOM_CAPACITY || 6;
-// const ROOM_WIDTH = process.env.ROOM_WIDTH || 10;
-// const ROOM_HEIGHT = process.env.ROOM_HEIGHT || 10;
+const lobbies = [
+  new Lobby('bulbasaur'),
+  new Lobby('charmander'),
+  new Lobby('squirtle')
+];
 
 /* =============================================================== */ 
 
@@ -98,19 +98,20 @@ const ROOM_CAPACITY = process.env.ROOM_CAPACITY || 6;
 io.on('connection', (socket) => {
 
   /* socket.on('join lobby')
-  When a user attempts to join lobby, the server will iterate through the array of lobbies and insert the user to the next available room. When there are no available rooms, the server will generate a new room to put the user in.
+  When a user attempts to join lobby, the server will iterate through the array of lobbies and insert the user to the next available room. It can be extended such that when there are no available rooms, the server will generate a new room to put the user in.
    */
 
   socket.on('join lobby', (data) => {
-    for (let i of lobbies) {
-    }
-  });
+    const { id, username, } = data; // username should be guaranteed unique
 
-  /* socket.on('disconnect')
-  
-   */
-  socket.on('disconnect', (data) => {
-  
+    for (let lobby of lobbies) {
+      if (!lobby.isFull() && !lobby.hasUser(username)) {
+        lobby.addUser(username, id);
+        // TODO: emit new lobby state to all users
+
+        break;
+      }
+    }
   });
   
   /* socket.on('join game')
