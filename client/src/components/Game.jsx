@@ -216,6 +216,9 @@ export default class Game extends Component {
   }
 
   handleCommands(e) {
+    // makes the matching case INsensitive
+    let value = e.target.value.toLowerCase();
+
     if (e.keyCode !== 13) { // If it is not the enter key
 
       // make the below case insensitive
@@ -248,12 +251,25 @@ export default class Game extends Component {
       // ------------------------------------------------------------
 
 
+
+
+      const pokeMatches = [];
+      for (let i = 0; i < this.state.pokemon.length; i++) {
+        const currentPokemon = this.state.pokemon[i];
+        if (matcher(value, currentPokemon.name)) {
+          pokeMatches.push(currentPokemon.name);
+        }
+      }
+
+      if (pokeMatches.length === 1) {
+        // autocomplete the field
+      }
+
+
+
       // stop executing the function
       return undefined;
     }
-
-    // makes the matching case INsensitive
-    let value = e.target.value.toLowerCase();
 
     // if (value === 'help') {
     if (matcher(value, 'help')) {
@@ -276,8 +292,6 @@ export default class Game extends Component {
         // } else if (value.split(' ')[0] === "choose") {
       } else if (matches(value.split(' ')[0], 'choose')) {
         this.commandHandlers().choose(value.split(' ')[1]);
-        // handle pokemon matching here
-        // if there is only 1 match from the list of the users pokemon
       } else {
         alert('invalid input!');
       }

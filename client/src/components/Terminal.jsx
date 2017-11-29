@@ -64,11 +64,11 @@ export default class Terminal extends Component {
               <div key={i} className={css.commandInstance}>
                 {command.command}
               </div>
-            )
+            );
           })}
         </div>
         <TextareaAutosize className={css.commandInput} value={this.props.commandInput} onKeyDown={this.props.handleCommands} onChange={(e) => this.props.handleInputChange(e, 'commandInput')} />
       </div>
-    )
+    );
   }
 }
