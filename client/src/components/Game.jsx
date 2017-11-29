@@ -101,6 +101,12 @@ export default class Game extends Component {
         }
       },
       gameOver: (data) => {
+        
+        // TODO: Save win-loss data in db
+        // build a gameObj
+        // use axios to do post request to /saveResults and send gameObj in body
+        
+
         this.setState({
           winner: data.name,
           gameOver: true,
