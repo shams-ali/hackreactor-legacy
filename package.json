@@ -11,7 +11,7 @@
   "scripts": {
     "start": "node server/app.js",
     "start-dev": "nodemon server/app.js",
-    "build": "NODE_ENV=production webpack --config ./webpack.config.js --progress --colors",
+    "build": "rm -rf ./client/dist/bundle.js && NODE_ENV=production webpack --config ./webpack.config.js --progress --colors",
     "postinstall": "npm run build",
     "test": "jest --forceExit & mocha test --exit"
   },
