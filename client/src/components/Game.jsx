@@ -141,7 +141,7 @@ export default class Game extends Component {
           socket.on('turn move', this.socketHandlers().turnMove);
           socket.on('gameover', this.socketHandlers().gameOver);
         } else {
-          this.props.history.replace("/login");
+          this.props.history.replace('/login');
         }
       });
   }
@@ -277,8 +277,7 @@ export default class Game extends Component {
       } else if (matches(value.split(' ')[0], 'choose')) {
         this.commandHandlers().choose(value.split(' ')[1]);
         // handle pokemon matching here
-        // use the matches function against each pokemon (with more than 0 HP)
-
+        // if there is only 1 match from the list of the users pokemon
       } else {
         alert('invalid input!');
       }
