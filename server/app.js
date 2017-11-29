@@ -3,7 +3,6 @@
 //   this line can be removed along with the .env file
 require('dotenv') // same as const dotenv = require('dotenv');
   .config(); // we just want to call .config, not save
-  
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -22,15 +21,6 @@ const { createPokemon, createTurnlog, createPlayer } = require('./helpers/creato
 const { damageCalculation } = require('../game-logic.js');
 
 const dist = path.join(__dirname, '/../client/dist');
-
-
-
-// This line sets the environment variables, since we are on our local machines
-// Therefore, in production (or whenever we are hosted on an actual server),
-//   this line can be removed along with the .env file
-require('dotenv') // same as const dotenv = require('dotenv');
-  .config(); // we just want to call .config, not save
-
 
 /* ======================== MIDDLEWARE ======================== */
 
@@ -87,6 +77,18 @@ on what is inside each player object
 
 const games = {};
 
+
+/* =============================================================== */ 
+
+// Lobbies are created as more users join the server and exceed the room capacity
+// By default, room will be of size n X n and allow up to m users per room
+// Try to keep capacity even so everybody has someone to play with
+
+const lobbies = new Set();
+const ROOM_CAPACITY = process.env.ROOM_CAPACITY || 6;
+// const ROOM_WIDTH = process.env.ROOM_WIDTH || 10;
+// const ROOM_HEIGHT = process.env.ROOM_HEIGHT || 10;
+
 /* =============================================================== */ 
 
 
@@ -94,6 +96,22 @@ const games = {};
 /* =============== SOCKET CONNECTION / LOGIC ===================== */
 
 io.on('connection', (socket) => {
+
+  /* socket.on('join lobby')
+  When a user attempts to join lobby, the server will iterate through the array of lobbies and insert the user to the next available room. When there are no available rooms, the server will generate a new room to put the user in.
+   */
+
+  socket.on('join lobby', (data) => {
+    for (let i of lobbies) {
+    }
+  });
+
+  /* socket.on('disconnect')
+  
+   */
+  socket.on('disconnect', (data) => {
+  
+  });
   
   /* socket.on('join game')
 
