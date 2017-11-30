@@ -5,7 +5,8 @@ const ROOM_HEIGHT = process.env.ROOM_HEIGHT || 10;
 class Lobby {
   constructor(name) {
     this.name = name;
-    this.users = {};
+    this.users = {}; // key assumed to be string username
+    this.ids = {}; // key assumed to be string socket id
     this.map = [...Array(ROOM_HEIGHT).keys()].map(i => Array(ROOM_WIDTH));
   }
 
@@ -21,45 +22,77 @@ class Lobby {
   }
 
   addUser(name, id) {
+    this.ids[id] = name;
     this.users[name] = {
-      id,
       position: this._spawnToMap(name),
       direction: 'down',
     };
+  }
+
+  getUserById(id) {
+    return this.ids[id];
+  }
+
+  getUserData() {
+    return this.users;
+  }
+
+  getIds() {
+    return Object.keys(this.ids);
+  }
+
+  getLobbyName() {
+    return this.name;
   }
 
   hasUser(name) {
     return !!this.users[name];
   }
 
-  move(name, dir) {
-    if (!this.users[name] || !Set(['up', 'down', 'left', 'right']).has(dir)) {
+  _move(name, rFrom, cFrom, rTo, cTo) {
+    if (rTo >= 0 && rTo < ROOM_HEIGHT && cTo >= 0 && cTo < ROOM_WIDTH && !this.map[rTo][cTo]) {
+      this.map[rTo][cTo] = this.map[rFrom][cFrom];
+      this.map[rFrom][cFrom] = undefined;
+      this.users[name].position = [rTo, cTo];
+    }
+  }
+
+  move(id, dir) {
+    const name = this.ids[id];
+
+    if (!this.users[name] || !(new Set(['up', 'down', 'left', 'right']).has(dir))) {
       return;
     }
 
+    const [ r, c ] = this.users[name].position;
     this.users[name].direction = dir;
 
     switch (dir) {
     case 'up':
-      // TODO: collision check, move
+      this._move(name, r, c, r - 1, c);
       break;
+
     case 'down':
-      // TODO: collision check, move
+      this._move(name, r, c, r + 1, c);
       break;
+
     case 'left':
-      // TODO: collision check, move
+      this._move(name, r, c, r, c - 1);
       break;
+
     case 'right':
-      // TODO: collision check, move
+      this._move(name, r, c, r, c + 1);
       break;
     }
   }
 
-  removeUser(name) {
-    if (this.users[name]) {
+  removeUserById(id) {
+    if (this.ids[id]) {
+      const name = this.ids[id];
       const [ r, c ] = this.users[name].position;
       this.map[r][c] = undefined;
       delete this.users[name];
+      delete this.ids[id];
     }
   }
 
