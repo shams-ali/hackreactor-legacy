@@ -26,8 +26,9 @@ const matcher = (target, source) => {
   }
 
   // search from the beginning of the source
-  //   Ex. This stops the command 'choose f' from selecting wigglytuff
-  //     Presumably, in that instance the user would prefer to get their farfetchd instead
+  //   Ex. Scenario: Pokemon array -> ['wigglytuff', 'charzard', 'farfetched']
+  //     This stops the command 'choose f' from selecting wigglytuff
+  //     Presumably, in this instance the user would prefer to get their farfetchd instead
   return new RegExp(target).test(source.slice(0, (target.length + 1)));
 };
 
@@ -268,7 +269,13 @@ export default class Game extends Component {
   handleCommands(e) {
     let value = e.target.value.toLowerCase();
 
-    if (e.keyCode !== 13) {
+    if (e.keyCode === 38) { // UP ARROW KEY
+      // replace current terminal input with value from command history
+    } else if (e.keyCode === 40) { // DOWN ARROW KEY
+      // replace current terminal input with value from command history
+    }
+
+    if (e.keyCode !== 13) { // NOT ENTER KEY
       return undefined;
     }
 
