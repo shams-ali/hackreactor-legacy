@@ -6,6 +6,7 @@ import Login from './Login.jsx';
 import Chat from './Chat.jsx';
 import Terminal from './Terminal.jsx';
 import GameView from './GameView.jsx';
+import GameHistory from './GameHistory.jsx';
 import GameOverView from './GameOverView.jsx';
 import GameState from './GameState.jsx';
 import Logo from './Logo.jsx';
@@ -136,6 +137,9 @@ export default class Game extends Component {
         setTimeout(() => this.props.history.replace('/'), 20000);
       },
       seppuku: (data) => {
+        // This method is triggered by a player typing 'seppuku' in the terminal.
+        // So, we appoint their opponent to be the winner.
+
         console.log('in socketHandlers - seppuku', data);
         console.log('this.state', this.state);
         console.log('this.props', this.props);
@@ -335,7 +339,6 @@ export default class Game extends Component {
       </div>
     );
   }
-
 
   render() {
     const { players, spectators, gameOver, pokemon } = this.state;
