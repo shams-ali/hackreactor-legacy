@@ -13,6 +13,11 @@ import css from '../styles.css';
 
 import help from './../../../utils/helpers.js';
 
+// A helper function for terminal commands to return true if the source contains the target string
+const matcher = (target, source) => {
+  return new RegExp(target).test(source);
+};
+
 export default class Game extends Component {
   constructor(props) {
     super(props);
