@@ -101,18 +101,34 @@ export default class Game extends Component {
         }
       },
       gameOver: (data) => {
-        
+        // This method is triggered by the winner's last 'attack' command.
+        // So, we can presume this player is the winner.
+
         // TODO: Save win-loss data in db
         // build a gameObj
         // use axios to do post request to /saveResults and send gameObj in body
-        
+        console.log('in socketHandlers - gameOver', data);
+        console.log('this.state', this.state);
+        console.log('this.props', this.props);
 
         this.setState({
           winner: data.name,
           gameOver: true,
           isActive: false
         }); 
-        setTimeout(() => this.props.history.replace("/"), 20000); 
+        // setTimeout(() => this.props.history.replace("/"), 20000); 
+      },
+      seppuku: (data) => {
+        console.log('in socketHandlers - seppuku', data);
+        console.log('this.state', this.state);
+        console.log('this.props', this.props);
+
+        this.setState({
+          winner: this.state.opponent.name,
+          gameOver: true,
+          isActive: false
+        }); 
+        // setTimeout(() => this.props.history.replace("/"), 20000); 
       }
     }
   }
@@ -140,6 +156,7 @@ export default class Game extends Component {
           socket.on('attack processed', this.socketHandlers().attackProcess); 
           socket.on('turn move', this.socketHandlers().turnMove);
           socket.on('gameover', this.socketHandlers().gameOver); 
+          socket.on('seppuku', this.socketHandlers().seppuku); 
         }
         else {
           this.props.history.replace("/login");
@@ -212,6 +229,14 @@ export default class Game extends Component {
         } else {
           alert('You do not have that pokemon!');
         }
+      },
+      seppuku: () => {
+        let opponentName = this.state.opponent.name;
+        console.log('You surrendered. This person wins: ', opponentName);
+        this.state.socket.emit('seppuku', {
+          gameid: this.props.match.params.gameid,
+          name: opponentName
+        });
       }
     }
   }
@@ -224,7 +249,11 @@ export default class Game extends Component {
 
     if (value === 'help') {
       return this.commandHandlers().help(); 
-    } 
+    }
+
+    if (value === 'seppuku') {
+      return this.commandHandlers().seppuku();
+    }
     
     if (!this.state.isActive) {
       alert('it is not your turn!');

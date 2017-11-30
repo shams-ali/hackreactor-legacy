@@ -178,6 +178,10 @@ io.on('connection', (socket) => {
     io.to(data.gameid).emit('turn move', game);
   })
 
+  socket.on('seppuku', data => {
+    io.to(data.gameid).emit('gameover', { name: data.name });
+  });
+
 });
 
 /* =============================================================== */
