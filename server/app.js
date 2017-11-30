@@ -3,7 +3,6 @@
 //   this line can be removed along with the .env file
 require('dotenv') // same as const dotenv = require('dotenv');
   .config(); // we just want to call .config, not save
-  
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -20,17 +19,9 @@ const passport = require('passport');
 const axios = require('axios');
 const { createPokemon, createTurnlog, createPlayer } = require('./helpers/creators.js'); 
 const { damageCalculation } = require('../game-logic.js');
+const Lobby = require('./helpers/Lobby');
 
 const dist = path.join(__dirname, '/../client/dist');
-
-
-
-// This line sets the environment variables, since we are on our local machines
-// Therefore, in production (or whenever we are hosted on an actual server),
-//   this line can be removed along with the .env file
-require('dotenv') // same as const dotenv = require('dotenv');
-  .config(); // we just want to call .config, not save
-
 
 /* ======================== MIDDLEWARE ======================== */
 
@@ -87,6 +78,17 @@ on what is inside each player object
 
 const games = {};
 
+
+/* =============================================================== */ 
+
+// Lobbies can be created as more users join the server and exceed the room capacity
+// Try to keep capacity even so everybody has someone to play with
+const lobbies = [
+  new Lobby('bulbasaur'),
+  new Lobby('charmander'),
+  new Lobby('squirtle')
+];
+
 /* =============================================================== */ 
 
 
@@ -94,6 +96,23 @@ const games = {};
 /* =============== SOCKET CONNECTION / LOGIC ===================== */
 
 io.on('connection', (socket) => {
+
+  /* socket.on('join lobby')
+  When a user attempts to join lobby, the server will iterate through the array of lobbies and insert the user to the next available room. It can be extended such that when there are no available rooms, the server will generate a new room to put the user in.
+   */
+
+  socket.on('join lobby', (data) => {
+    const { id, username, } = data; // username should be guaranteed unique
+
+    for (let lobby of lobbies) {
+      if (!lobby.isFull() && !lobby.hasUser(username)) {
+        lobby.addUser(username, id);
+        // TODO: emit new lobby state to all users
+
+        break;
+      }
+    }
+  });
   
   /* socket.on('join game')
 
