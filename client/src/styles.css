@@ -53,6 +53,10 @@ body {
   height: 30%;
 }
 
+.chattermonLogo {
+  margin-top: 0;
+}
+
 .messageInstance {
   padding: 7px 0;
 }

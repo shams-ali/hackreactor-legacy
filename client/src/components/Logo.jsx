@@ -15,9 +15,10 @@ const Logo = (props) => {
   }
   return (
     <div className={css.logoContainer}>
-      <h2><span><img src={'https://art.ngfiles.com/images/386000/386577_stardoge_8-bit-pokeball.png?f1446737358'} style={{maxWidth: '50px'}} /></span>Chattermon</h2>
+      <h2 className={css.chattermonLogo}><span><img src={'https://art.ngfiles.com/images/386000/386577_stardoge_8-bit-pokeball.png?f1446737358'} style={{maxWidth: '50px'}} /></span>Chattermon</h2>
       <h4>{props.name} v. {props.opponent ? props.opponent.name : '???' }</h4>
       <h4>{renderTurn()}</h4>
+      <button className={css.gameButton} onClick={function() { props.toggleGameHistory() }}>Win/Loss Record</button>
     </div>
   )
 }

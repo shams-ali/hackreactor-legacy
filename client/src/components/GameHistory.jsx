@@ -15,7 +15,7 @@ const GameHistory = (props) => {
           );
         })}
       </div>
-      <button className={css.gameButton}>Close</button>
+      <button className={css.gameButton} onClick={function() { props.toggleGameHistory() }}>Close</button>
     </div>
   );
 }

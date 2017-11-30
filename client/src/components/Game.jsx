@@ -49,12 +49,14 @@ export default class Game extends Component {
       chatInput: '',
       commandInput: '',
       commandArray: [{ command: 'The game will begin shortly - type \'help\' to learn how to play' }],
-      socket: null
-    };
+      socket: null,
+      showGameHistory: false
+    }
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChatInputSubmit = this.handleChatInputSubmit.bind(this);
     this.handleCommands = this.handleCommands.bind(this);
+    this.toggleGameHistory = this.toggleGameHistory.bind(this);
   }
 
   socketHandlers() {
@@ -324,7 +326,7 @@ export default class Game extends Component {
         </div>
       );
     } else if (this.state.gameOver) {
-      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} />;
+      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} />
     } else {
       return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />;
     }
@@ -333,11 +335,23 @@ export default class Game extends Component {
   renderSideBar() {
     return (
       <div className={css.stateContainer}>
-        <Logo name={this.state.name} isActive={this.state.isActive} opponent={this.state.opponent} />
+        <Logo name={this.state.name} isActive={this.state.isActive} opponent={this.state.opponent} toggleGameHistory={this.toggleGameHistory} />
         <GameState pokemon={this.state.pokemon} />
         <Chat messageArray={this.state.messageArray} chatInput={this.state.chatInput} handleChatInputSubmit={this.handleChatInputSubmit} handleInputChange={this.handleInputChange} />
       </div>
     );
+  }
+
+  renderGameHistory() {
+    if (this.state.showGameHistory) {
+      return (
+        <GameHistory toggleGameHistory={this.toggleGameHistory} />
+      );
+    }
+  }
+
+  toggleGameHistory() {
+    this.setState({ showGameHistory: !this.state.showGameHistory });
   }
 
   render() {
@@ -349,6 +363,7 @@ export default class Game extends Component {
           <Terminal commandArray={this.state.commandArray} commandInput={this.state.commandInput} handleCommands={this.handleCommands} handleInputChange={this.handleInputChange} />
         </div>
         {this.renderSideBar()}
+        {this.renderGameHistory()}
       </div>
     );
   }
