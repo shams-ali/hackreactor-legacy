@@ -13,10 +13,21 @@ import css from '../styles.css';
 
 import help from './../../../utils/helpers.js';
 
-// A helper function for terminal commands to return true if the source contains the target string
+// A helper function for terminal commands, to return true if the source contains the target string
+//   Ex. source -> 'attack' contains the targets -> 'a', 'at', 'att', 'atta', 'attac', and 'attack'
+//   Ex. source -> 'attack' does NOT contain the targets -> 'h', 'he', 'hel', or 'help'
+//   Ex. source -> 'help' does NOT contain the targets -> 'c', 'ch', 'cho', 'choo', 'choos', or 'choose'
 const matcher = (target, source) => {
-  if (target.length < 1) { return false; }
-  return new RegExp(target).test(source);
+  if (target.length < 1) { // if the target is an empty string, don't bother searching
+    return false;
+  } else if (target.length > source.length) { // if the target is longer than the source, it's not a match
+    return false;
+  }
+
+  // search from the beginning of the source
+  //   Ex. This stops the command 'choose f' from selecting wigglytuff
+  //     Presumably, in that instance the user would prefer to get their farfetchd instead
+  return new RegExp(target).test(source.slice(0, (target.length + 1)));
 };
 
 export default class Game extends Component {
@@ -276,10 +287,19 @@ export default class Game extends Component {
           setTimeout(() => this.commandHandlers().attack(), 300);
         }
       } else if (matcher(value.split(' ')[0], 'choose')) {
-        this.commandHandlers().choose(value.split(' ')[1]);
-
         // handle choosing pokemon here
+        const teamMatches = [];
+        const team = this.state.pokemon;
 
+        // check every member of the team for a match
+        for (let i = 0; i < team.length; i++) {
+          if (matcher(value.split(' ')[1], team[i].name)) {
+            teamMatches.push(team[i].name);
+          }
+        }
+
+        // use the first match found
+        this.commandHandlers().choose(teamMatches[0]);
       } else {
         alert('invalid input!');
       }
