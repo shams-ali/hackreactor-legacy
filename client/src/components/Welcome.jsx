@@ -94,6 +94,8 @@ export default class Welcome extends Component {
                 <input className={css.roomIdField} placeholder="Room ID" value={this.state.roomInput} onKeyDown={this.handleRoomInputReturn} onChange={this.handleRoomInputChange}></input>
                 {joinGameButton}
               </div>
+              <div className={css.seperator}></div>
+              <Link to={'lobby'} className={css.gameButtonLink}><button className={css.gameButton}>Join Lobby</button></Link>
             </div>
           </div>
         </div>
