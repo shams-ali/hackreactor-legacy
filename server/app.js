@@ -25,6 +25,13 @@ const dist = path.join(__dirname, '/../client/dist');
 
 
 
+// This line sets the environment variables, since we are on our local machines
+// Therefore, in production (or whenever we are hosted on an actual server),
+//   this line can be removed along with the .env file
+require('dotenv') // same as const dotenv = require('dotenv');
+  .config(); // we just want to call .config, not save
+
+
 /* ======================== MIDDLEWARE ======================== */
 
 app.use(bodyParser());
@@ -171,6 +178,10 @@ io.on('connection', (socket) => {
     io.to(data.gameid).emit('turn move', game);
   })
 
+  socket.on('seppuku', data => {
+    io.to(data.gameid).emit('gameover', { name: data.name });
+  });
+
 });
 
 /* =============================================================== */
@@ -273,6 +284,16 @@ app.get('/logout', (req, resp) => {
 
 /* =============================================================== */
 
+/* =============== WIN / LOSS RESULTS ================= */
+
+app.post('/saveResults', (req, resp) => {
+  // Get data from req.body
+  // db.saveWinLoss(gameObj)
+  // if error...
+});
+
+
+/* =============================================================== */
 
 // a catch-all route for BrowserRouter - enables direct linking to this point.
 

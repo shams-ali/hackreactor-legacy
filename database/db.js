@@ -65,8 +65,10 @@ const WinLoss = sequelize.define('winlossito', {
   loser_pokemon: Sequelize.ARRAY(Sequelize.INTEGER)
 });
 
+// Create the tables in the DB
 Users.sync();
 Pokemon.sync();
+WinLoss.sync();
 
 // Users
 //   .findAll()
@@ -101,24 +103,26 @@ const savePokemon = (pokemonObj) => {
   .catch((err) => {
     console.log('POKEMON SAVED ERROR: ', err);
   });
-}
+};
 
-// Users
-
-//   .findAll()
-//   .then(users => {
-//     console.log("FOUND USERS")
-//     console.log(users);
-//   })
-
-
+const saveWinLoss = (gameObj) => {
+  console.log('IN SAVE WINLOSS!');
+  WinLoss.create(gameObj).then((data) => {
+    console.log('WINLOSS DATA: ', data);
+    console.log('WINLOSS SAVED TO DB!');
+  })
+  .catch((err) => {
+    console.log('WIN/LOSS SAVE ERROR: ', err);
+  });
+};
 
 module.exports = {
   connecttion: sequelize,
   saveUser: saveUser,
+  saveWinLoss: saveWinLoss,
   Users: Users,
   Pokemon: Pokemon
-}
+};
 
 // POSTGRES WITHOUT SEQUELIZE
 // const { Client } = require('pg');
