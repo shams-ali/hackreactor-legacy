@@ -9,11 +9,12 @@
     "npm": "5.4.2"
   },
   "scripts": {
-    "start": "node server/app.js",
-    "start-dev": "nodemon server/app.js",
+    "start": "npm run build-once && node server/app.js",
+    "start-dev": "npm run build & nodemon server/app.js",
     "prebuild": "npm run clean",
     "clean": "rimraf ./client/dist/bundle.js ",
-    "build": "NODE_ENV=production webpack --config ./webpack.config.js --progress --colors",
+    "build": "NODE_ENV=production webpack --config ./webpack.config.js --progress --colors  --watch ",
+    "build-once": "npm run clean && NODE_ENV=production webpack --config ./webpack.config.js --progress --colors",
     "postinstall": "npm run build",
     "test": "jest --forceExit & mocha test --exit",
     "fill-pokedex": "node utils/populatePokemonDb.js"
