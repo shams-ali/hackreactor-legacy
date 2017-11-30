@@ -55,7 +55,7 @@ export default class Game extends Component {
       commandArray: [{ command: 'The game will begin shortly - type \'help\' to learn how to play' }],
       socket: null,
       showGameHistory: false
-    }
+    };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChatInputSubmit = this.handleChatInputSubmit.bind(this);
@@ -360,7 +360,7 @@ export default class Game extends Component {
         </div>
       );
     } else if (this.state.gameOver) {
-      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} />
+      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} />;
     } else {
       return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />;
     }
