@@ -58,7 +58,7 @@ const WinLoss = sequelize.define('winlossito', {
     primaryKey: true,
     unique: true
   },
-  gameDate: Sequelize.DATE,
+  gameDate: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
   winner_id: Sequelize.INTEGER,
   winner_pokemon: Sequelize.ARRAY(Sequelize.INTEGER),
   loser_id: Sequelize.INTEGER,
