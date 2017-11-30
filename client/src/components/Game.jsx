@@ -14,6 +14,9 @@ import css from '../styles.css';
 
 import help from './../../../utils/helpers.js';
 
+import { commandHistory } from './../../../utils/commandHistory.js';
+
+
 // A helper function for terminal commands, to return true if the source contains the target string
 //   Ex. source -> 'attack' contains the targets -> 'a', 'at', 'att', 'atta', 'attac', and 'attack'
 //   Ex. source -> 'attack' does NOT contain the targets -> 'h', 'he', 'hel', or 'help'
@@ -58,6 +61,9 @@ export default class Game extends Component {
     this.handleChatInputSubmit = this.handleChatInputSubmit.bind(this);
     this.handleCommands = this.handleCommands.bind(this);
     this.toggleGameHistory = this.toggleGameHistory.bind(this);
+
+    // keeps track of the user's terminal commands for easy future use with Up/Down arrow keys
+    this.commandList = new commandHistory();
   }
 
   socketHandlers() {
@@ -213,6 +219,9 @@ export default class Game extends Component {
   commandHandlers() {
     return {
       help: () => {
+        // add the command to the user's command list history
+        this.commandList.addCommand('help');
+
         this.setState(prevState => {
           return {
             commandArray: prevState.commandArray.concat(help),
@@ -231,6 +240,9 @@ export default class Game extends Component {
         });
       },
       choose: (pokemonToSwap) => {
+        // add the command to the user's command list history
+        this.commandList.addCommand('choose ' + pokemonToSwap);
+
         let isAvailable = false;
         let index;
         let health;
@@ -260,19 +272,31 @@ export default class Game extends Component {
           gameid: this.props.match.params.gameid,
           name: opponentName
         });
+      },
+      nextCommand: () => {
+        this.setState({
+          'commandInput': this.commandList.getNextCommand()
+        });
+      },
+      prevCommand: () => {
+        this.setState({
+          'commandInput': this.commandList.getPrevCommand()
+        });
       }
     };
   }
-
-
 
   handleCommands(e) {
     let value = e.target.value.toLowerCase();
 
     if (e.keyCode === 38) { // UP ARROW KEY
       // replace current terminal input with value from command history
+      return this.commandHandlers().nextCommand();
     } else if (e.keyCode === 40) { // DOWN ARROW KEY
       // replace current terminal input with value from command history
+      return this.commandHandlers().prevCommand();
+    } else if (e.keyCode === 9) { // TAB KEY
+      // TODO: tab to autocomplete
     }
 
     if (e.keyCode !== 13) { // NOT ENTER KEY
@@ -294,6 +318,9 @@ export default class Game extends Component {
         if (this.state.pokemon[0].health <= 0) {
           alert('you must choose a new pokemon, this one has fainted!');
         } else {
+          // add the command to the user's command list history
+          this.commandList.addCommand('attack');
+
           this.setState({
             attacking: true
           });
