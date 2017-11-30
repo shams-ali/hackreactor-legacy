@@ -47,15 +47,22 @@ export default class Lobby extends Component {
 
     switch (event.key.toLowerCase()) {
     case 'w':
+    case 'arrowup':
       socket.emit('lobby move', { lobby: lobby, dir: 'up' });
       break;
+
     case 'a':
+    case 'arrowleft':
       socket.emit('lobby move', { lobby: lobby, dir: 'left' });
       break;
+
     case 's':
+    case 'arrowdown':
       socket.emit('lobby move', { lobby: lobby, dir: 'down' });
       break;
+
     case 'd':
+    case 'arrowright':
       socket.emit('lobby move', { lobby: lobby, dir: 'right' });
       break;
     }
