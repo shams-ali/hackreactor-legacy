@@ -6,6 +6,7 @@ import Login from './Login.jsx';
 import Chat from './Chat.jsx';
 import Terminal from './Terminal.jsx';
 import GameView from './GameView.jsx';
+import GameHistory from './GameHistory.jsx';
 import GameOverView from './GameOverView.jsx';
 import GameState from './GameState.jsx';
 import Logo from './Logo.jsx';
@@ -48,12 +49,14 @@ export default class Game extends Component {
       chatInput: '',
       commandInput: '',
       commandArray: [{ command: 'The game will begin shortly - type \'help\' to learn how to play' }],
-      socket: null
-    };
+      socket: null,
+      showGameHistory: false
+    }
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChatInputSubmit = this.handleChatInputSubmit.bind(this);
     this.handleCommands = this.handleCommands.bind(this);
+    this.toggleGameHistory = this.toggleGameHistory.bind(this);
   }
 
   socketHandlers() {
@@ -136,6 +139,9 @@ export default class Game extends Component {
         setTimeout(() => this.props.history.replace('/'), 20000);
       },
       seppuku: (data) => {
+        // This method is triggered by a player typing 'seppuku' in the terminal.
+        // So, we appoint their opponent to be the winner.
+
         console.log('in socketHandlers - seppuku', data);
         console.log('this.state', this.state);
         console.log('this.props', this.props);
@@ -320,7 +326,7 @@ export default class Game extends Component {
         </div>
       );
     } else if (this.state.gameOver) {
-      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} />;
+      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} />
     } else {
       return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />;
     }
@@ -329,13 +335,24 @@ export default class Game extends Component {
   renderSideBar() {
     return (
       <div className={css.stateContainer}>
-        <Logo name={this.state.name} isActive={this.state.isActive} opponent={this.state.opponent} />
+        <Logo name={this.state.name} isActive={this.state.isActive} opponent={this.state.opponent} toggleGameHistory={this.toggleGameHistory} />
         <GameState pokemon={this.state.pokemon} />
         <Chat messageArray={this.state.messageArray} chatInput={this.state.chatInput} handleChatInputSubmit={this.handleChatInputSubmit} handleInputChange={this.handleInputChange} />
       </div>
     );
   }
 
+  renderGameHistory() {
+    if (this.state.showGameHistory) {
+      return (
+        <GameHistory toggleGameHistory={this.toggleGameHistory} />
+      );
+    }
+  }
+
+  toggleGameHistory() {
+    this.setState({ showGameHistory: !this.state.showGameHistory });
+  }
 
   render() {
     const { players, spectators, gameOver, pokemon } = this.state;
@@ -346,6 +363,7 @@ export default class Game extends Component {
           <Terminal commandArray={this.state.commandArray} commandInput={this.state.commandInput} handleCommands={this.handleCommands} handleInputChange={this.handleInputChange} />
         </div>
         {this.renderSideBar()}
+        {this.renderGameHistory()}
       </div>
     );
   }
