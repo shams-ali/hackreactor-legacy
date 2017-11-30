@@ -116,7 +116,7 @@ export default class Game extends Component {
           gameOver: true,
           isActive: false
         }); 
-        // setTimeout(() => this.props.history.replace("/"), 20000); 
+        setTimeout(() => this.props.history.replace("/"), 20000); 
       },
       seppuku: (data) => {
         console.log('in socketHandlers - seppuku', data);
@@ -128,7 +128,7 @@ export default class Game extends Component {
           gameOver: true,
           isActive: false
         }); 
-        // setTimeout(() => this.props.history.replace("/"), 20000); 
+        setTimeout(() => this.props.history.replace("/"), 20000); 
       }
     }
   }
