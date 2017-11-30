@@ -35,7 +35,7 @@ body {
 .stateContainer {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 1fr 1fr; 
+  grid-template-rows: 1fr 1fr 1fr;
   grid-gap: 20px;
   min-height: 0;
 }
@@ -110,14 +110,14 @@ body {
 }
 
 .commandInstance {
-  font-family: 'Press Start 2P', cursive;  
+  font-family: 'Press Start 2P', cursive;
   font-size: 0.575rem;
   padding: 7px 0 0;
   width: 100%;
 }
 
 .commandInput {
-  font-family: 'Press Start 2P', cursive;  
+  font-family: 'Press Start 2P', cursive;
   flex-grow: 0.05;
   border-color: rgb(205, 169, 86);
   border-width: 5px;
@@ -144,13 +144,30 @@ body {
 .stats {
   font-family: 'Press Start 2P', cursive;
   background-color: rgb(249, 248, 218);
-  color: rgb(117, 114, 104);
+  /*color: rgb(117, 114, 104);*/
+  color: red;
   height: 100px;
   width: 300px;
   padding: 10px;
   margin: 10px;
   border: 4px solid rgb(41, 64, 14);
   border-radius: 5px;
+}
+
+.hpBar {
+  display: block;
+  position: relative;
+  width: 200px;
+  height: 30px;
+  background: pink;
+}
+
+.hp {
+  display: block;
+  position: absolute;
+  width: 100px;
+  height: 30px;
+  background: purple;
 }
 
 .navBar {
@@ -327,14 +344,14 @@ body {
 
 .gameOver {
   font-family: 'Press Start 2P', cursive;
-  text-align: center; 
-  color: rgb(117, 114, 104); 
+  text-align: center;
+  color: rgb(117, 114, 104);
 }
 
 .winnerPokeView {
-  margin: 5em; 
+  margin: 5em;
   display: flex;
-  justify-content: space-between; 
+  justify-content: space-between;
 }
 
 .attackAnimation {
