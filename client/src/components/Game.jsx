@@ -15,6 +15,7 @@ import help from './../../../utils/helpers.js';
 
 // A helper function for terminal commands to return true if the source contains the target string
 const matcher = (target, source) => {
+  if (target.length < 1) { return false; }
   return new RegExp(target).test(source);
 };
 
@@ -254,18 +255,18 @@ export default class Game extends Component {
       return undefined;
     }
 
-    if (value === 'help') {
+    if (matcher(value, 'help')) {
       return this.commandHandlers().help();
     }
 
-    if (value === 'seppuku') {
+    if (matcher(value, 'seppuku')) {
       return this.commandHandlers().seppuku();
     }
 
     if (!this.state.isActive) {
       alert('it is not your turn!');
     } else {
-      if (value === 'attack') {
+      if (matcher(value, 'attack')) {
         if (this.state.pokemon[0].health <= 0) {
           alert('you must choose a new pokemon, this one has fainted!');
         } else {
@@ -274,8 +275,11 @@ export default class Game extends Component {
           });
           setTimeout(() => this.commandHandlers().attack(), 300);
         }
-      } else if (value.split(' ')[0] === 'choose') {
+      } else if (matcher(value.split(' ')[0], 'choose')) {
         this.commandHandlers().choose(value.split(' ')[1]);
+
+        // handle choosing pokemon here
+
       } else {
         alert('invalid input!');
       }
