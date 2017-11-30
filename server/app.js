@@ -83,11 +83,11 @@ const games = {};
 
 // Lobbies can be created as more users join the server and exceed the room capacity
 // Try to keep capacity even so everybody has someone to play with
-const lobbies = [
-  new Lobby('bulbasaur'),
-  new Lobby('charmander'),
-  new Lobby('squirtle')
-];
+const lobbies = {
+  bulbasaur: new Lobby('bulbasaur'),
+  charmander: new Lobby('charmander'),
+  squirtle: new Lobby('squirtle'),
+};
 
 /* =============================================================== */ 
 
@@ -97,21 +97,35 @@ const lobbies = [
 
 io.on('connection', (socket) => {
 
+  // Send new lobby state to all users
+  const emitMap = (lobby) => {
+    lobby.getIds().forEach((id) => {
+      io.to(id).emit('lobby update', {
+        lobby: lobby.getLobbyName(),
+        users: lobby.getUserData(),
+        map: lobby.getMap(),
+      });
+    });
+  };
+
   /* socket.on('join lobby')
   When a user attempts to join lobby, the server will iterate through the array of lobbies and insert the user to the next available room. It can be extended such that when there are no available rooms, the server will generate a new room to put the user in.
    */
 
-  socket.on('join lobby', (data) => {
-    const { id, username, } = data; // username should be guaranteed unique
-
-    for (let lobby of lobbies) {
-      if (!lobby.isFull() && !lobby.hasUser(username)) {
-        lobby.addUser(username, id);
-        // TODO: emit new lobby state to all users
+  socket.on('join lobby', ({ name }) => {
+    for (let lobby of Object.values(lobbies)) {
+      if (!lobby.isFull() && !lobby.hasUser(name)) {
+        lobby.addUser(name, socket.id);
+        emitMap(lobby);
 
         break;
       }
     }
+  });
+
+  socket.on('lobby move', ({ lobby, dir }) => {
+    lobbies[lobby].move(socket.id, dir);
+    emitMap(lobbies[lobby]);
   });
   
   /* socket.on('join game')
