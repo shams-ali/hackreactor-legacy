@@ -14,6 +14,9 @@ import css from '../styles.css';
 
 import help from './../../../utils/helpers.js';
 
+import { commandHistory } from './../../../utils/commandHistory.js';
+
+
 // A helper function for terminal commands, to return true if the source contains the target string
 //   Ex. source -> 'attack' contains the targets -> 'a', 'at', 'att', 'atta', 'attac', and 'attack'
 //   Ex. source -> 'attack' does NOT contain the targets -> 'h', 'he', 'hel', or 'help'
@@ -26,8 +29,9 @@ const matcher = (target, source) => {
   }
 
   // search from the beginning of the source
-  //   Ex. This stops the command 'choose f' from selecting wigglytuff
-  //     Presumably, in that instance the user would prefer to get their farfetchd instead
+  //   Ex. Scenario: Pokemon array -> ['wigglytuff', 'charzard', 'farfetched']
+  //     This stops the command 'choose f' from selecting wigglytuff
+  //     Presumably, in this instance the user would prefer to get their farfetchd instead
   return new RegExp(target).test(source.slice(0, (target.length + 1)));
 };
 
@@ -51,12 +55,15 @@ export default class Game extends Component {
       commandArray: [{ command: 'The game will begin shortly - type \'help\' to learn how to play' }],
       socket: null,
       showGameHistory: false
-    }
+    };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChatInputSubmit = this.handleChatInputSubmit.bind(this);
     this.handleCommands = this.handleCommands.bind(this);
     this.toggleGameHistory = this.toggleGameHistory.bind(this);
+
+    // keeps track of the user's terminal commands for easy future use with Up/Down arrow keys
+    this.commandList = new commandHistory();
   }
 
   socketHandlers() {
@@ -212,6 +219,9 @@ export default class Game extends Component {
   commandHandlers() {
     return {
       help: () => {
+        // add the command to the user's command list history
+        this.commandList.addCommand('help');
+
         this.setState(prevState => {
           return {
             commandArray: prevState.commandArray.concat(help),
@@ -230,6 +240,9 @@ export default class Game extends Component {
         });
       },
       choose: (pokemonToSwap) => {
+        // add the command to the user's command list history
+        this.commandList.addCommand('choose ' + pokemonToSwap);
+
         let isAvailable = false;
         let index;
         let health;
@@ -259,16 +272,54 @@ export default class Game extends Component {
           gameid: this.props.match.params.gameid,
           name: opponentName
         });
+      },
+      nextCommand: () => {
+        let newInputText; // declare here, due to scope
+        if (this.state.commandInput === '') { // if the current terminal input text is ''
+          const command = this.commandList.getRecentCommand();
+          // then ensure that the new terminal input text is NOT ''
+          newInputText = (command !== '') ? command : this.commandList.getRecentCommand();
+        } else {
+          newInputText = this.commandList.getRecentCommand();
+        }
+
+        // set the new terminal input text
+        this.setState({
+          'commandInput': newInputText
+        });
+      },
+      prevCommand: () => {
+        let newInputText; // declare here, due to scope
+        if (this.state.commandInput === '') { // if the current terminal input text is ''
+          const command = this.commandList.getOldCommand();
+          // then ensure that the new terminal input text is NOT ''
+          newInputText = (command !== '') ? command : this.commandList.getOldCommand();
+        } else {
+          newInputText = this.commandList.getOldCommand();
+        }
+
+        // set the new terminal input text
+        this.setState({
+          'commandInput': newInputText
+        });
       }
     };
   }
 
-
-
   handleCommands(e) {
     let value = e.target.value.toLowerCase();
 
-    if (e.keyCode !== 13) {
+    if (e.keyCode === 38) { // UP ARROW KEY
+      // replace current terminal input with value from command history
+      return this.commandHandlers().nextCommand();
+    } else if (e.keyCode === 40) { // DOWN ARROW KEY
+      // replace current terminal input with value from command history
+      return this.commandHandlers().prevCommand();
+    } else if (e.keyCode === 9) { // TAB KEY
+      // TODO: tab to autocomplete
+    }
+
+    if (e.keyCode !== 13) { // If the user did NOT hit the 'enter' key, just return undefined
       return undefined;
     }
 
@@ -287,6 +338,9 @@ export default class Game extends Component {
         if (this.state.pokemon[0].health <= 0) {
           alert('you must choose a new pokemon, this one has fainted!');
         } else {
+          // add the command to the user's command list history
+          this.commandList.addCommand('attack');
+
           this.setState({
             attacking: true
           });
@@ -326,7 +380,7 @@ export default class Game extends Component {
         </div>
       );
     } else if (this.state.gameOver) {
-      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} />
+      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} />;
     } else {
       return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />;
     }
