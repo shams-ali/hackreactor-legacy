@@ -49,6 +49,12 @@ export default class Login extends Component {
     });
   }
 
+  handleEnterKey(event) {
+    if (event.key === 'Enter') {
+      this.handleSubmit();
+    }
+  }
+
   handleSubmit() {
     const username = this.state.username;
     const password = this.state.password;
@@ -96,13 +102,13 @@ export default class Login extends Component {
           <div className={css.fieldErrorWrapper}>
             <div className={css.fieldErrorText}>Username does not exist</div>
             <input type="text" id="usernameField" className={css.fieldErrorInput} placeholder="Username"
-              value={this.state.username} onChange={this.handleUsernameChange}></input>
+              value={this.state.username} onChange={this.handleUsernameChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
           </div>
         );
       } else {
         usernameField = (
           <input type="text" id='usernameField' className={css.signInUpField} placeholder="Username"
-            value={this.state.username} onChange={this.handleUsernameChange}></input>
+            value={this.state.username} onChange={this.handleUsernameChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
         );
       }
 
@@ -111,13 +117,13 @@ export default class Login extends Component {
           <div className={css.fieldErrorWrapper}>
             <div className={css.fieldErrorText}>Password is incorrect</div>
             <input type="password" className={css.fieldErrorInput} placeholder="Password"
-              value={this.state.password} onChange={this.handlePasswordChange}></input>
+              value={this.state.password} onChange={this.handlePasswordChange} onClick={this.handleSubmit} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
           </div>
         );
       } else {
         passwordField = (
           <input type="password" className={css.signInUpField} placeholder="Password"
-            value={this.state.password} onChange={this.handlePasswordChange}></input>
+            value={this.state.password} onChange={this.handlePasswordChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
         );
       }
 
