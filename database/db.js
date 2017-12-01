@@ -110,6 +110,9 @@ const getWinLoss = (playerName, callback) => {
   WinLoss.findAll({
       raw: true,
       attributes: ['id', 'winner_name', 'winner_pokemon', 'loser_name', 'loser_pokemon' ],
+      where: { 
+        [Sequelize.Op.or]: [{ winner_name: playerName }, { loser_name: playerName }] 
+      },
       limit: 10,
       order: sequelize.literal('id DESC')
     })
