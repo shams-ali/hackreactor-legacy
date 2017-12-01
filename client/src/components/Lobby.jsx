@@ -2,6 +2,8 @@ import React, { Component, } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
 
+import styles from '../lobby.css';
+
 export default class Lobby extends Component {
   constructor(props) {
     super(props);
@@ -68,28 +70,36 @@ export default class Lobby extends Component {
     }
   }
 
+  // TODO: separate lobby, user and map updates
   handleUpdateLobby({ lobby, users, map }) {
-    // TODO: separate user and map updates
     this.setState({ lobby, users, map });
   }
 
   render() {
     const { users, map } = this.state;
+
     return (
       <div>
-        <table>
-          { // TODO: table should be replaced with something pretty
-            map.map((row, rowId) => (
-              <tr key={rowId}>
-                {
-                  row.map((col, colId) => (
-                    <td key={colId}>{(col) ? '11' : '00'}</td>
-                  ))
-                }
-              </tr>
-            ))
-          }
-        </table>
+        {map.map((row, rowId) => (
+          <div key={rowId} className={styles.row}>
+            {row.map((col, colId) => {
+              return (
+                <div key={colId} className={styles.grass}></div>
+              );
+            })}
+          </div>
+        ))}
+
+        {Object.entries(users).map(([ name, data ]) => {
+          const { position, direction } = data;
+          const style = {
+            position: 'absolute',
+            left: position[1] * 34,
+            top: position[0] * 32,
+          };
+
+          return <div key={name} className={styles[`player-${direction}`]} style={style}></div>;
+        })}
       </div>
     );
   }
