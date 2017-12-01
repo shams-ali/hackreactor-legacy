@@ -145,7 +145,6 @@ export default class Game extends Component {
           // use axios to do post request to /saveResults and send gameObj in body
           axios.post('/saveResults', gameObj)
             .then((data) => {
-              // console.log('post to /saveResults success');
               return data;
             })
             .catch((error) => {
@@ -156,19 +155,6 @@ export default class Game extends Component {
 
         this.setState({
           winner: data.name,
-          gameOver: true,
-          isActive: false
-        });
-        setTimeout(() => this.props.history.replace('/'), 20000);
-      },
-      seppuku: (data) => {
-        // This method is triggered by a player typing 'seppuku' in the terminal.
-        // So, we appoint their opponent to be the winner.
-
-        console.log('in socketHandlers - seppuku', data);
-
-        this.setState({
-          winner: this.state.opponent.name,
           gameOver: true,
           isActive: false
         });
@@ -281,7 +267,6 @@ export default class Game extends Component {
       },
       seppuku: () => {
         let opponentName = this.state.opponent.name;
-        console.log('You surrendered. This person wins: ', opponentName);
         this.state.socket.emit('seppuku', {
           gameid: this.props.match.params.gameid,
           name: opponentName
