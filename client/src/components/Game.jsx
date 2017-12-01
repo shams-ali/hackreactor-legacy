@@ -120,7 +120,7 @@ export default class Game extends Component {
       attackProcess: (data) => {
         this.setState(prevState => {
           return {
-            commandArray: prevState.commandArray.concat(data.basicAttackDialog)
+            commandArray: prevState.commandArray.concat('\n').concat(data.basicAttackDialog)
           };
         });
       },
@@ -244,7 +244,7 @@ export default class Game extends Component {
 
         this.setState(prevState => {
           return {
-            commandArray: prevState.commandArray.concat(help),
+            commandArray: prevState.commandArray.concat('\n').concat(help),
             commandInput: ''
           };
         });
@@ -424,7 +424,7 @@ export default class Game extends Component {
         </div>
       );
     } else if (this.state.gameOver) {
-      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} gameOver={gameOver}/>;
+      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} gameOver={gameOver} />;
     } else {
       return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />;
     }
