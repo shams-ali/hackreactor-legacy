@@ -316,9 +316,12 @@ app.get('/logout', (req, resp) => {
 /* =============== WIN / LOSS RESULTS ================= */
 
 app.post('/saveResults', (req, resp) => {
-  // Get data from req.body
-  // db.saveWinLoss(gameObj)
-  // if error...
+  db.saveWinLoss(req.body, function(err, data) {
+    if (err) {
+      resp.status(500).send(err);
+    }
+    resp.status(201).send(JSON.stringify(data));
+  });
 });
 
 

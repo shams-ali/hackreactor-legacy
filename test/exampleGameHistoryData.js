@@ -16,7 +16,7 @@ var exampleGameData = {
       ]
     },
     {
-      id: 1,
+      id: 2,
       winner_name: "AlanIan",
       winner_pokemon: [ 
         { name: "chansey", health: 250, initialHealth: 250, attack: 5, defense: 5, sprites: { front_default: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/113.png" } },
@@ -31,7 +31,7 @@ var exampleGameData = {
       ]
     },
     {
-      id: 1,
+      id: 3,
       winner_name: "Vixie",
       winner_pokemon: [ 
         { name: "chansey", health: 250, initialHealth: 250, attack: 5, defense: 5, sprites: { front_default: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/113.png" } },
