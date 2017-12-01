@@ -27,36 +27,30 @@ export default class Signup extends Component {
 
   componentWillMount() {
     axios('/user')
-    .then(({ data }) => {
-      if (data.username) {
-        const username = data.username;
-        this.setState({
-          name: username
-        });
-        this.props.history.replace("/welcome");
-      }
-    });
+      .then(({ data }) => {
+        if (data.username) {
+          const username = data.username;
+          this.setState({
+            name: username
+          });
+          this.props.history.replace("/welcome");
+        }
+      });
   }
 
   handleUsernameChange(e) {
-    console.log('Username changed to', e.target.value);
-
     this.setState({
       username: e.target.value
     });
   }
 
   handlePasswordChange(e) {
-    console.log('Password changed to', e.target.value);
-
     this.setState({
       password: e.target.value
     });
   }
 
   handleEmailChange(e) {
-    console.log('Email changed to', e.target.value);
-
     this.setState({
       email: e.target.value
     });
@@ -75,7 +69,6 @@ export default class Signup extends Component {
   }
 
   handleSubmit() {
-    console.log('click\'d');
     const username = this.state.username;
     const password = this.state.password;
     const email = this.state.email;
@@ -94,13 +87,12 @@ export default class Signup extends Component {
     }
 
     axios({
-        method: 'post',
-        url: '/signup',
-        baseUrl: process.env.baseURL || 'http://localhost:3000',
-        data: { username, password, email }
-      })
+      method: 'post',
+      url: '/signup',
+      baseUrl: process.env.baseURL || 'http://localhost:3000',
+      data: { username, password, email }
+    })
       .then(resp => {
-        console.log(resp.data)
         if (typeof resp.data === 'string' && resp.data.match('Email Already Exists')) {
           alert('This email already exists, try again!');
         }
@@ -121,10 +113,10 @@ export default class Signup extends Component {
     let usernameField = null;
     let emailField = null;
     let passwordError = this.state.matchingPasswordError
-    ? <div className={css.fieldErrorWrapper}>
+      ? <div className={css.fieldErrorWrapper}>
         <div className={css.fieldErrorText}>Passwords are not the same</div>
       </div>
-    : null;
+      : null;
 
     if (this.state.usernameUniqueError) {
       usernameField = <div className={css.fieldErrorWrapper}>

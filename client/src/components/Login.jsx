@@ -22,43 +22,38 @@ export default class Login extends Component {
 
   componentWillMount() {
     axios('/user')
-    .then(({ data }) => {
-      if (data.username) {
-        const username = data.username;
-        this.setState({
-          name: username
-        });
-        this.props.history.replace("/welcome");
-      }
-    });
+      .then(({ data }) => {
+        if (data.username) {
+          const username = data.username;
+          this.setState({
+            name: username
+          });
+          this.props.history.replace("/welcome");
+        }
+      });
   }
 
   handleUsernameChange(e) {
-    console.log('Username changed to', e.target.value);
-
     this.setState({
       username: e.target.value
     });
   }
 
   handlePasswordChange(e) {
-    console.log('Password changed to', e.target.value);
-
     this.setState({
       password: e.target.value
     });
   }
 
   handleSubmit() {
-    console.log('click\'d');
     const username = this.state.username;
     const password = this.state.password;
     axios({
-        method: 'post',
-        url: '/login',
-        baseUrl: process.env.baseURL || 'http://localhost:3000',
-        data: { username, password }
-      })
+      method: 'post',
+      url: '/login',
+      baseUrl: process.env.baseURL || 'http://localhost:3000',
+      data: { username, password }
+    })
       .then(resp => {
         if (resp.data.match('Username Not Found')) {
           console.log('Username Not Found');
@@ -84,12 +79,12 @@ export default class Login extends Component {
   render() {
     if (this.state.registered === false) {
       return (
-        <Redirect to="/signup"/>
+        <Redirect to="/signup" />
       )
     }
     else if (this.state.registered === true) {
       return (
-        <Redirect to="/welcome"/>
+        <Redirect to="/welcome" />
       )
     }
     else {
