@@ -1,27 +1,7 @@
 import React, { Component } from 'react';
 import css from '../PokemonStats.css';
 
-
-
 const PokemonStats = (props) => {
-<<<<<<< HEAD
-  let barWidth = '50px';
-  let hpWidth = '50px';
-
-  return (
-    <div className={css.stats}>
-      <h2>{props.stats.name.toUpperCase()}</h2>
-      <div
-        // style={}
-        className={css.hpBar}>
-        <div
-          className={css.hp}
-          style={{width: width}}>
-        </div>
-      </div>
-      <h4 style={{marginBottom: '2px'}}> {props.stats.health} / {props.stats.initialHealth} </h4>
-      <h6 style={{marginTop: '5px'}}> atk: {props.stats.attack} - def: {props.stats.defense} </h6>
-=======
   let damage = props.stats.health / props.stats.initialHealth;
 
   let healthPoints = {
@@ -63,8 +43,11 @@ const PokemonStats = (props) => {
         </div>
       </div>
 
+<<<<<<< HEAD
       <div style={{marginBottom: '2px'}}> {props.stats.health} / {props.stats.initialHealth} </div>
->>>>>>> 648e19b61c804526846e8ef48fba8936fcc1ef3f
+=======
+      <div>{props.stats.health} / {props.stats.initialHealth}</div>
+>>>>>>> 4dcd8a2c735a75c535f7d87752155933ecc17078
     </div>
   );
 };
