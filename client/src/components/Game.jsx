@@ -286,6 +286,11 @@ export default class Game extends Component {
         }
       },
       seppuku: () => {
+        // set terminal input to be an empty string
+        this.setState({
+          'commandInput': ''
+        });
+
         let opponentName = this.state.opponent.name;
         this.state.socket.emit('seppuku', {
           gameid: this.props.match.params.gameid,
