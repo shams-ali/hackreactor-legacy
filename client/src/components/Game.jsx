@@ -70,12 +70,14 @@ export default class Game extends Component {
       commandInput: '',
       commandArray: [{ command: 'The game will begin shortly - type \'help\' to learn how to play' }],
       socket: null,
-      showGameHistory: false
+      showGameHistory: false,
+      gameHistoryData: []
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChatInputSubmit = this.handleChatInputSubmit.bind(this);
     this.handleCommands = this.handleCommands.bind(this);
+    this.getGameHistory = this.getGameHistory.bind(this);
     this.toggleGameHistory = this.toggleGameHistory.bind(this);
 
     // keeps track of the user's terminal commands for easy future use with Up/Down arrow keys
@@ -166,7 +168,6 @@ export default class Game extends Component {
             .catch((error) => {
               console.log('post to /saveResults error', error);
             });
-
         }
 
         this.setState({
@@ -179,6 +180,16 @@ export default class Game extends Component {
     };
   }
 
+  getGameHistory(playerName) {
+    axios(`/gameHistory?playerName=${playerName}`)
+      .then((gameHistoryData) => {
+        this.setState({ gameHistoryData: gameHistoryData.data });
+      })
+      .catch((error) => {
+        console.log('Error getting Game History: ', error);
+      });
+  }
+
   componentDidMount() {
     axios('/user')
       .then(({ data }) => {
@@ -189,6 +200,7 @@ export default class Game extends Component {
             name: username,
             socket
           });
+          this.getGameHistory(data.username);
           const playerInit = {
             gameid: this.props.match.params.gameid,
             name: username,
@@ -453,7 +465,7 @@ export default class Game extends Component {
   renderGameHistory() {
     if (this.state.showGameHistory) {
       return (
-        <GameHistory toggleGameHistory={this.toggleGameHistory} />
+        <GameHistory name={this.state.name} gameHistoryData={this.state.gameHistoryData} toggleGameHistory={this.toggleGameHistory} />
       );
     }
   }

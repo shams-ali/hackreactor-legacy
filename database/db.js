@@ -106,19 +106,40 @@ const savePokemon = (pokemonObj) => {
   });
 };
 
+const getWinLoss = (playerName, callback) => {
+  WinLoss.findAll({
+      raw: true,
+      attributes: ['id', 'winner_name', 'winner_pokemon', 'loser_name', 'loser_pokemon' ],
+      where: { 
+        [Sequelize.Op.or]: [{ winner_name: playerName }, { loser_name: playerName }] 
+      },
+      limit: 10,
+      order: sequelize.literal('id DESC')
+    })
+    .then((gameHistoryData) => {
+      callback(null, gameHistoryData);
+    })
+    .catch((err) => {
+      console.log('db.js GET GAME HISTORY ERROR: ', err);
+      callback(err, null);
+    });
+};
+
 const saveWinLoss = (gameObj, callback) => {
-  WinLoss.create(gameObj).then((data) => {
-    callback(null, data);
-  })
-  .catch((err) => {
-    console.log('WIN/LOSS SAVE ERROR: ', err);
-    callback(err, null);
-  });
+  WinLoss.create(gameObj)
+    .then((data) => {
+      callback(null, data);
+    })
+    .catch((err) => {
+      console.log('WIN/LOSS SAVE ERROR: ', err);
+      callback(err, null);
+    });
 };
 
 module.exports = {
   connecttion: sequelize,
   saveUser: saveUser,
+  getWinLoss: getWinLoss,
   saveWinLoss: saveWinLoss,
   Users: Users,
   Pokemon: Pokemon

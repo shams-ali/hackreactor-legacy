@@ -8,9 +8,9 @@ const path = require('path');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const Promise = require('bluebird');
 const db = require('../database/db.js');
 const bodyParser = require('body-parser');
-const Promise = require('bluebird');
 const bcrypt = Promise.promisifyAll(require('bcrypt'));
 const saltRounds = 10;
 const cookieParser = require('cookie-parser');
@@ -323,6 +323,15 @@ app.get('/logout', (req, resp) => {
 /* =============================================================== */
 
 /* =============== WIN / LOSS RESULTS ================= */
+
+app.get('/gameHistory', (req, resp) => {
+  db.getWinLoss(req.query.playerName, function(err, data) {
+    if (err) {
+      resp.status(404).send(err);
+    }
+    resp.status(200).send(JSON.stringify(data));
+  });
+});
 
 app.post('/saveResults', (req, resp) => {
   db.saveWinLoss(req.body, function (err, data) {
