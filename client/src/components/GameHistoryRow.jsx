@@ -14,8 +14,8 @@ const GameHistoryRow = (props) => {
         <div className={hist.team}>
           {props.game.winner_pokemon.map(poke => {
             return (
-              <div className={hist.pokemonCard}>
-                <PokemonCard sprites={poke.sprites} name={poke.name} health={poke.health} initialHealth={poke.initialHealth} key={poke.name} />
+              <div className={hist.pokemonCard} key={poke.name} >
+                <PokemonCard sprites={poke.sprites} name={poke.name} health={poke.health} initialHealth={poke.initialHealth} />
               </div>
             );      
           })}
@@ -27,8 +27,8 @@ const GameHistoryRow = (props) => {
         <div className={hist.team}>
           {props.game.loser_pokemon.map(poke => {
             return (
-              <div className={hist.pokemonCard}>
-                <PokemonCard sprites={poke.sprites} name={poke.name} health={poke.health} initialHealth={poke.initialHealth} key={poke.name} />
+              <div className={hist.pokemonCard} key={poke.name}>
+                <PokemonCard sprites={poke.sprites} name={poke.name} health={poke.health} initialHealth={poke.initialHealth} />
               </div>
             );      
           })}
