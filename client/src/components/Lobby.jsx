@@ -11,7 +11,6 @@ export default class Lobby extends Component {
     this.state = {
       name: null,
       socket: null,
-      lobby: null,
       users: {},
       map: [[]],
     };
@@ -45,34 +44,56 @@ export default class Lobby extends Component {
   }
 
   handleKeydown(event) {
-    const { socket, lobby } = this.state;
+    const { socket, map, name, users } = this.state;
 
     switch (event.key.toLowerCase()) {
     case 'w':
     case 'arrowup':
-      socket.emit('lobby move', { lobby: lobby, dir: 'up' });
+      socket.emit('lobby move', { dir: 'up' });
       break;
 
     case 'a':
     case 'arrowleft':
-      socket.emit('lobby move', { lobby: lobby, dir: 'left' });
+      socket.emit('lobby move', { dir: 'left' });
       break;
 
     case 's':
     case 'arrowdown':
-      socket.emit('lobby move', { lobby: lobby, dir: 'down' });
+      socket.emit('lobby move', { dir: 'down' });
       break;
 
     case 'd':
     case 'arrowright':
-      socket.emit('lobby move', { lobby: lobby, dir: 'right' });
+      socket.emit('lobby move', { dir: 'right' });
+      break;
+
+    case ' ':
+    case 'j':
+    case 'enter':
+      let { position: [ r, c ], direction } = users[name];
+
+      if (direction === 'up') {
+        --r;
+      } else if (direction === 'down') {
+        ++r;
+      } else if (direction === 'left') {
+        --c;
+      } else if (direction === 'right') {
+        ++c;
+      }
+
+      const target = map[r][c];
+      if (target) {
+        console.log('interacting with', target);
+        socket.emit('lobby interact', { target });
+      }
       break;
     }
   }
 
   // TODO: separate lobby, user and map updates
-  handleUpdateLobby({ lobby, users, map }) {
-    this.setState({ lobby, users, map });
+  handleUpdateLobby({ users, map }) {
+    this.setState({ users, map });
   }
 
   render() {

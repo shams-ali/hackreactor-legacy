@@ -89,6 +89,9 @@ const lobbies = {
   squirtle: new Lobby('squirtle'),
 };
 
+// Map sockets to lobbies
+const lobbyUsers = {};
+
 /* =============================================================== */
 
 
@@ -101,7 +104,6 @@ io.on('connection', (socket) => {
   const emitMap = (lobby) => {
     lobby.getIds().forEach((id) => {
       io.to(id).emit('lobby update', {
-        lobby: lobby.getLobbyName(),
         users: lobby.getUserData(),
         map: lobby.getMap(),
       });
@@ -116,6 +118,7 @@ io.on('connection', (socket) => {
     for (let lobby of Object.values(lobbies)) {
       if (!lobby.isFull() && !lobby.hasUser(name)) {
         lobby.addUser(name, socket.id);
+        lobbyUsers[socket.id] = lobby;
         emitMap(lobby);
 
         break;
@@ -123,9 +126,10 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('lobby move', ({ lobby, dir }) => {
-    lobbies[lobby].move(socket.id, dir);
-    emitMap(lobbies[lobby]);
+  socket.on('lobby move', ({ dir }) => {
+    const lobby = lobbyUsers[socket.id];
+    lobby.move(socket.id, dir);
+    emitMap(lobby);
   });
 
   /* socket.on('join game')
