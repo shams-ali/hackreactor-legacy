@@ -168,7 +168,6 @@ export default class Game extends Component {
             .catch((error) => {
               console.log('post to /saveResults error', error);
             });
-
         }
 
         this.setState({
