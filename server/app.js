@@ -229,13 +229,9 @@ io.on('connection', (socket) => {
 
 
 app.post('/login', (req, resp) => {
-  console.log('post request on /login');
   const username = req.body.username;
   const password = req.body.password;
 
-
-  console.log('username', username);
-  console.log('password', password);
   db.Users
     .findOne({ where: { username } })
     .then(user => {
@@ -265,7 +261,6 @@ app.post('/login', (req, resp) => {
 });
 
 app.post('/signup', (req, resp) => {
-  console.log('post request on /signup');
   const username = req.body.username;
   const password = req.body.password;
   const email = req.body.email;
@@ -275,7 +270,6 @@ app.post('/signup', (req, resp) => {
       if (newuser.dataValues) {
         req.login({ user_id: newuser.id }, err => {
           if (err) { throw err; }
-          console.log("NEW USER ID:", newuser.id);
           req.session.username = username;
           req.session.loggedIn = true;
           let session = JSON.stringify(req.session);
