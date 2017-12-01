@@ -128,33 +128,33 @@ export default class Game extends Component {
         }
       },
       gameOver: (data) => {
-        // This method is triggered by the winner's last 'attack' command.
-        // So, we can presume this player is the winner.
+        // 'data' just contains the name of the winner
+        // If this method is triggered by this player's 'attack' command, we appoint this player the winner.
+        // If this method is triggered by this player typing 'seppuku' in the terminal, we appoint the opponent the winner.
 
-        // TODO: Save win-loss data in db
-        // build a gameObj
-        // use axios to do post request to /saveResults and send gameObj in body
-        console.log('in socketHandlers - gameOver', data);
-        console.log('this.state', this.state);
-        console.log('this.props', this.props);
+        // If this player is the winner, save game data to the db.
+        // We don't do this in the opponent's instance because we don't want to create a duplicate row in the db.
+        if (this.state.name === data.name) {
+          const gameObj = {
+            winner_name: this.state.name,
+            winner_pokemon: this.state.pokemon,
+            loser_name: this.state.opponent.name,
+            loser_pokemon: this.state.opponent.pokemon
+          };
+
+          // use axios to do post request to /saveResults and send gameObj in body
+          axios.post('/saveResults', gameObj)
+            .then((data) => {
+              return data;
+            })
+            .catch((error) => {
+              console.log('post to /saveResults error', error);
+            });          
+
+        }
 
         this.setState({
           winner: data.name,
-          gameOver: true,
-          isActive: false
-        });
-        setTimeout(() => this.props.history.replace('/'), 20000);
-      },
-      seppuku: (data) => {
-        // This method is triggered by a player typing 'seppuku' in the terminal.
-        // So, we appoint their opponent to be the winner.
-
-        console.log('in socketHandlers - seppuku', data);
-        console.log('this.state', this.state);
-        console.log('this.props', this.props);
-
-        this.setState({
-          winner: this.state.opponent.name,
           gameOver: true,
           isActive: false
         });
@@ -267,7 +267,6 @@ export default class Game extends Component {
       },
       seppuku: () => {
         let opponentName = this.state.opponent.name;
-        console.log('You surrendered. This person wins: ', opponentName);
         this.state.socket.emit('seppuku', {
           gameid: this.props.match.params.gameid,
           name: opponentName

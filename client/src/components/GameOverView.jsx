@@ -11,7 +11,7 @@ const GameOverView = (props) => {
         <div className={css.winnerPokeView}>
           {props.pokemon.map(poke => {
             return (
-              <div>
+              <div key={poke.name}>
                 <Pokemon key={poke.name} sprite={poke.sprites.front_default} />
                 <h5>{poke.name}</h5>
                 <h5>{poke.health} / {poke.initialHealth}</h5>
