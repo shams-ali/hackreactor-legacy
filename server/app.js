@@ -240,6 +240,15 @@ app.post('/login', (req, resp) => {
       // found => compare passwords
       // don't match => end resp
       // login
+
+      // TODO: FIX THE BELOW ERROR
+      //   If the then's if statement (!passwordsMatch) is true
+      //   then the server will try to RE-send the header
+      //   (assuming that (!user) is also true)
+      //   It should only send either 1 or the other
+      //   OR wait until it has all of the scenarios accounted for,
+      //     then send everything at the end, all at once
+
       if (!user) {
         resp.writeHead(201, { 'Content-Type': 'text/plain' });
         resp.end('Username Not Found');
@@ -316,7 +325,7 @@ app.get('/logout', (req, resp) => {
 /* =============== WIN / LOSS RESULTS ================= */
 
 app.post('/saveResults', (req, resp) => {
-  db.saveWinLoss(req.body, function(err, data) {
+  db.saveWinLoss(req.body, function (err, data) {
     if (err) {
       resp.status(500).send(err);
     }

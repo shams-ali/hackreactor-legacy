@@ -33,6 +33,10 @@ export default class Login extends Component {
       });
   }
 
+  componentDidMount() {
+    document.getElementById('usernameField').focus();
+  }
+
   handleUsernameChange(e) {
     this.setState({
       username: e.target.value
@@ -91,13 +95,13 @@ export default class Login extends Component {
         usernameField = (
           <div className={css.fieldErrorWrapper}>
             <div className={css.fieldErrorText}>Username does not exist</div>
-            <input type="text" className={css.fieldErrorInput} placeholder="Username"
+            <input type="text" id="usernameField" className={css.fieldErrorInput} placeholder="Username"
               value={this.state.username} onChange={this.handleUsernameChange}></input>
           </div>
         );
       } else {
         usernameField = (
-          <input type="text" className={css.signInUpField} placeholder="Username"
+          <input type="text" id='usernameField' className={css.signInUpField} placeholder="Username"
             value={this.state.username} onChange={this.handleUsernameChange}></input>
         );
       }
