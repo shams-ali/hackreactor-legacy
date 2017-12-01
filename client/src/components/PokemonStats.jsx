@@ -15,6 +15,7 @@ const PokemonStats = (props) => {
     'height': '20px',
     'width': `${damage * 100}%`,
     'background': '#6EF9A8', // green
+    'transition': 'all 2s ease'
   };
 
   if (damage === 1) {
@@ -23,11 +24,11 @@ const PokemonStats = (props) => {
     healthDamage.borderRadius = '20px 0 0 20px';
   } else if (damage >= 0.45 && damage <= 0.65) {
     healthDamage.background = '#F8DE33'; // orange
-    healthDamage.transition = 'all 0.7s ease';
+    healthDamage.transition = 'all 1s ease';
     healthDamage.borderRadius = '20px 0 0 20px';
   } else if (damage >= 0 && damage <= 0.45) {
     healthDamage.background = '#FB4F43'; // red
-    healthDamage.transition = 'all 0.3s ease';
+    healthDamage.transition = 'all 0.25s ease';
     healthDamage.borderRadius = '20px 0 0 20px';
   }
 
