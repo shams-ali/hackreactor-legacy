@@ -138,40 +138,10 @@ body {
   outline-width: 0;
 }
 
-
 .pokeView {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 20px;
-}
-
-.stats {
-  font-family: 'Press Start 2P', cursive;
-  background-color: rgb(249, 248, 218);
-  /*color: rgb(117, 114, 104);*/
-  color: red;
-  height: 100px;
-  width: 300px;
-  padding: 10px;
-  margin: 10px;
-  border: 4px solid rgb(41, 64, 14);
-  border-radius: 5px;
-}
-
-.hpBar {
-  display: block;
-  position: relative;
-  width: 200px;
-  height: 30px;
-  background: pink;
-}
-
-.hp {
-  display: block;
-  position: absolute;
-  width: 100px;
-  height: 30px;
-  background: purple;
 }
 
 .navBar {
