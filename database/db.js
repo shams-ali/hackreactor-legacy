@@ -56,13 +56,14 @@ const WinLoss = sequelize.define('winlossito', {
   id: {
     type: Sequelize.INTEGER,
     primaryKey: true,
-    unique: true
+    unique: true,
+    autoIncrement: true
   },
   gameDate: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
-  winner_id: Sequelize.INTEGER,
-  winner_pokemon: Sequelize.ARRAY(Sequelize.INTEGER),
-  loser_id: Sequelize.INTEGER,
-  loser_pokemon: Sequelize.ARRAY(Sequelize.INTEGER)
+  winner_name: Sequelize.STRING,
+  winner_pokemon: Sequelize.ARRAY(Sequelize.JSONB),
+  loser_name: Sequelize.STRING,
+  loser_pokemon: Sequelize.ARRAY(Sequelize.JSONB)
 });
 
 // Create the tables in the DB
@@ -105,14 +106,13 @@ const savePokemon = (pokemonObj) => {
   });
 };
 
-const saveWinLoss = (gameObj) => {
-  console.log('IN SAVE WINLOSS!');
+const saveWinLoss = (gameObj, callback) => {
   WinLoss.create(gameObj).then((data) => {
-    console.log('WINLOSS DATA: ', data);
-    console.log('WINLOSS SAVED TO DB!');
+    callback(null, data);
   })
   .catch((err) => {
     console.log('WIN/LOSS SAVE ERROR: ', err);
+    callback(err, null);
   });
 };
 

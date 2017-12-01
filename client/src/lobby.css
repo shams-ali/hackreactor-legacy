@@ -1,0 +1,46 @@
+.row {
+  height: 32px;
+}
+
+.terrain {
+  display: inline-block;
+  height: 32px;
+  width: 32px;
+  background: url(/assets/terrain.bmp) 0 0 no-repeat;
+  background-size: 2072px 950px;
+  border: 1px solid grey;
+  z-index: -1;
+}
+
+.grass {
+  composes: terrain;
+  background-position: calc(-3 * 34px) calc(-3 * 34px);
+}
+
+.player {
+  display: inline-block;
+  height: 32px;
+  width: 32px;
+  background: url(/assets/trainer.png) 0 0 no-repeat;
+  border: 1px solid red;
+}
+
+.player-up {
+  composes: player;
+}
+
+.player-down {
+  composes: player;
+  background-position: 0px calc(-2 * 32px);
+}
+
+.player-left {
+  composes: player;
+  background-position: 0px calc(-1 * 32px);
+}
+
+.player-right {
+  composes: player;
+  background-position: 0px calc(-3 * 32px);
+}
+
