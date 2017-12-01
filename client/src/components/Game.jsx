@@ -120,7 +120,7 @@ export default class Game extends Component {
       attackProcess: (data) => {
         this.setState(prevState => {
           return {
-            commandArray: prevState.commandArray.concat(data.basicAttackDialog)
+            commandArray: prevState.commandArray.concat('\n').concat(data.basicAttackDialog)
           };
         });
       },
@@ -244,7 +244,7 @@ export default class Game extends Component {
 
         this.setState(prevState => {
           return {
-            commandArray: prevState.commandArray.concat(help),
+            commandArray: prevState.commandArray.concat('\n').concat(help),
             commandInput: ''
           };
         });
@@ -402,8 +402,18 @@ export default class Game extends Component {
         // handle choosing pokemon here
         const teamMatches = getTeamMatches(this.state.pokemon, value.split(' ')[1]);
 
-        // use the first match found
-        this.commandHandlers().choose(teamMatches[0]);
+        if (this.state.pokemon[0].name === teamMatches[0]) {
+          // The user is trying to choose their current pokemon, don't allow that
+          this.setState(prevState => {
+            return {
+              commandArray: prevState.commandArray.concat('\n').concat([{ command: 'This Pokemon is already chosen!' }]),
+              commandInput: ''
+            };
+          });
+        } else {
+          // use the first match found
+          this.commandHandlers().choose(teamMatches[0]);
+        }
       } else {
         alert('invalid input!');
       }
@@ -424,7 +434,7 @@ export default class Game extends Component {
         </div>
       );
     } else if (this.state.gameOver) {
-      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} gameOver={gameOver}/>;
+      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} gameOver={gameOver} />;
     } else {
       return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />;
     }

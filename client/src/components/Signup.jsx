@@ -38,6 +38,10 @@ export default class Signup extends Component {
       });
   }
 
+  componentDidMount() {
+    document.getElementById('usernameField').focus();
+  }
+
   handleUsernameChange(e) {
     this.setState({
       username: e.target.value
@@ -66,6 +70,12 @@ export default class Signup extends Component {
         ? false
         : true
     });
+  }
+
+  handleEnterKey(event) {
+    if (event.key === 'Enter') {
+      this.handleSubmit();
+    }
   }
 
   handleSubmit() {
@@ -120,14 +130,14 @@ export default class Signup extends Component {
       usernameField = (
         <div className={css.fieldErrorWrapper}>
           <div className={css.fieldErrorText}>Username already exists</div>
-          <input type="text" className={css.fieldErrorInput} placeholder="Username"
-            value={this.state.username} onChange={this.handleUsernameChange}></input>
+          <input type="text" id="usernameField" className={css.fieldErrorInput} placeholder="Username"
+            value={this.state.username} onChange={this.handleUsernameChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
         </div>
       );
     } else {
       usernameField = (
-        <input type="text" className={css.signInUpField} placeholder="Username"
-          value={this.state.username} onChange={this.handleUsernameChange}></input>
+        <input type="text" id="usernameField" className={css.signInUpField} placeholder="Username"
+          value={this.state.username} onChange={this.handleUsernameChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
       );
     }
 
@@ -136,13 +146,13 @@ export default class Signup extends Component {
         <div className={css.fieldErrorWrapper}>
           <div className={css.fieldErrorText}>Email has an account already</div>
           <input type="text" className={css.fieldErrorInput} placeholder="Email"
-            value={this.state.email} onChange={this.handleEmailChange}></input>
+            value={this.state.email} onChange={this.handleEmailChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
         </div>
       );
     } else {
       emailField = (
         <input type="text" className={css.signInUpField} placeholder="Email"
-          value={this.state.email} onChange={this.handleEmailChange}></input>
+          value={this.state.email} onChange={this.handleEmailChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
       );
     }
 
@@ -161,9 +171,9 @@ export default class Signup extends Component {
             <div className={css.controlsContainer}>
               <div className={css.joinGameContainer}>
                 {usernameField}
-                <input type="password" className={css.signInUpField} placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange}></input>
+                <input type="password" className={css.signInUpField} placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
                 {passwordError}
-                <input type="password" className={css.signInUpField} placeholder="Repeat Your Password" value={this.state.repeatPassword} onChange={this.handlePasswordMatch}></input>
+                <input type="password" className={css.signInUpField} placeholder="Repeat Your Password" value={this.state.repeatPassword} onChange={this.handlePasswordMatch} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
                 {emailField}
                 <button className={css.gameButton} onClick={this.handleSubmit}>Sign Up</button>
               </div>
