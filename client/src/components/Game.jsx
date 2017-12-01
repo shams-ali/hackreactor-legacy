@@ -35,6 +35,23 @@ const matcher = (target, source) => {
   return new RegExp(target).test(source.slice(0, (target.length + 1)));
 };
 
+// A helper function that returns an array of possible matches of pokemon to a string
+// The input string is just the potential match of the name itself, not the command
+//   Ex. value = 'pika', not value = 'choose pika'
+const getTeamMatches = (team, value) => {
+  // handle choosing pokemon here
+  const teamMatches = [];
+
+  // check every member of the team for a match
+  for (let i = 0; i < team.length; i++) {
+    if (matcher(value, team[i].name)) {
+      teamMatches.push(team[i].name);
+    }
+  }
+
+  return teamMatches;
+};
+
 export default class Game extends Component {
   constructor(props) {
     super(props);
@@ -315,7 +332,35 @@ export default class Game extends Component {
       // replace current terminal input with value from command history
       return this.commandHandlers().prevCommand();
     } else if (e.keyCode === 9) { // TAB KEY
-      // TODO: tab to autocomplete
+      // stop the tap keypress from changing the focus
+      e.preventDefault();
+
+      // check the terminal input for values to autocomplete
+      if (matcher(value, 'help')) {
+        this.setState({
+          'commandInput': 'help'
+        });
+      } else if (matcher(value, 'seppuku')) {
+        this.setState({
+          'commandInput': 'seppuku'
+        });
+      } else if (matcher(value, 'attack')) {
+        this.setState({
+          'commandInput': 'attack'
+        });
+      } else if (matcher(value.split(' ')[0], 'choose')) {
+        if (value.split(' ').length > 1) { // if they also have a pokemon name started
+          this.setState({
+            'commandInput': 'choose ' + getTeamMatches(this.state.pokemon, value.split(' ')[1])[0]
+          });
+        } else { // just the command 'choose'
+          this.setState({
+            'commandInput': 'choose'
+          });
+        }
+      } else {
+        // there is no matching command, so there's nothing to autocomplete
+      }
     }
 
     if (e.keyCode !== 13) { // If the user did NOT hit the 'enter' key, just return undefined
@@ -347,15 +392,7 @@ export default class Game extends Component {
         }
       } else if (matcher(value.split(' ')[0], 'choose')) {
         // handle choosing pokemon here
-        const teamMatches = [];
-        const team = this.state.pokemon;
-
-        // check every member of the team for a match
-        for (let i = 0; i < team.length; i++) {
-          if (matcher(value.split(' ')[1], team[i].name)) {
-            teamMatches.push(team[i].name);
-          }
-        }
+        const teamMatches = getTeamMatches(this.state.pokemon, value.split(' ')[1]);
 
         // use the first match found
         this.commandHandlers().choose(teamMatches[0]);
