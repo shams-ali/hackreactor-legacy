@@ -16,7 +16,6 @@ import help from './../../../utils/helpers.js';
 
 import { commandHistory } from './../../../utils/commandHistory.js';
 
-
 // A helper function for terminal commands, to return true if the source contains the target string
 //   Ex. source -> 'attack' contains the targets -> 'a', 'at', 'att', 'atta', 'attac', and 'attack'
 //   Ex. source -> 'attack' does NOT contain the targets -> 'h', 'he', 'hel', or 'help'
@@ -166,7 +165,7 @@ export default class Game extends Component {
             })
             .catch((error) => {
               console.log('post to /saveResults error', error);
-            });          
+            });
 
         }
 
@@ -207,6 +206,10 @@ export default class Game extends Component {
         } else {
           this.props.history.replace('/login');
         }
+      })
+      .then(() => {
+        // Set the focus to be on the terminal input
+        const areas = document.getElementsByTagName('textArea')[0].focus();
       });
   }
 
