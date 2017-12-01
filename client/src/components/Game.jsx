@@ -14,6 +14,9 @@ import css from '../styles.css';
 
 import help from './../../../utils/helpers.js';
 
+import { commandHistory } from './../../../utils/commandHistory.js';
+
+
 // A helper function for terminal commands, to return true if the source contains the target string
 //   Ex. source -> 'attack' contains the targets -> 'a', 'at', 'att', 'atta', 'attac', and 'attack'
 //   Ex. source -> 'attack' does NOT contain the targets -> 'h', 'he', 'hel', or 'help'
@@ -26,9 +29,27 @@ const matcher = (target, source) => {
   }
 
   // search from the beginning of the source
-  //   Ex. This stops the command 'choose f' from selecting wigglytuff
-  //     Presumably, in that instance the user would prefer to get their farfetchd instead
+  //   Ex. Scenario: Pokemon array -> ['wigglytuff', 'charzard', 'farfetched']
+  //     This stops the command 'choose f' from selecting wigglytuff
+  //     Presumably, in this instance the user would prefer to get their farfetchd instead
   return new RegExp(target).test(source.slice(0, (target.length + 1)));
+};
+
+// A helper function that returns an array of possible matches of pokemon to a string
+// The input string is just the potential match of the name itself, not the command
+//   Ex. value = 'pika', not value = 'choose pika'
+const getTeamMatches = (team, value) => {
+  // handle choosing pokemon here
+  const teamMatches = [];
+
+  // check every member of the team for a match
+  for (let i = 0; i < team.length; i++) {
+    if (matcher(value, team[i].name)) {
+      teamMatches.push(team[i].name);
+    }
+  }
+
+  return teamMatches;
 };
 
 export default class Game extends Component {
@@ -51,12 +72,15 @@ export default class Game extends Component {
       commandArray: [{ command: 'The game will begin shortly - type \'help\' to learn how to play' }],
       socket: null,
       showGameHistory: false
-    }
+    };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChatInputSubmit = this.handleChatInputSubmit.bind(this);
     this.handleCommands = this.handleCommands.bind(this);
     this.toggleGameHistory = this.toggleGameHistory.bind(this);
+
+    // keeps track of the user's terminal commands for easy future use with Up/Down arrow keys
+    this.commandList = new commandHistory();
   }
 
   socketHandlers() {
@@ -121,33 +145,33 @@ export default class Game extends Component {
         }
       },
       gameOver: (data) => {
-        // This method is triggered by the winner's last 'attack' command.
-        // So, we can presume this player is the winner.
+        // 'data' just contains the name of the winner
+        // If this method is triggered by this player's 'attack' command, we appoint this player the winner.
+        // If this method is triggered by this player typing 'seppuku' in the terminal, we appoint the opponent the winner.
 
-        // TODO: Save win-loss data in db
-        // build a gameObj
-        // use axios to do post request to /saveResults and send gameObj in body
-        console.log('in socketHandlers - gameOver', data);
-        console.log('this.state', this.state);
-        console.log('this.props', this.props);
+        // If this player is the winner, save game data to the db.
+        // We don't do this in the opponent's instance because we don't want to create a duplicate row in the db.
+        if (this.state.name === data.name) {
+          const gameObj = {
+            winner_name: this.state.name,
+            winner_pokemon: this.state.pokemon,
+            loser_name: this.state.opponent.name,
+            loser_pokemon: this.state.opponent.pokemon
+          };
+
+          // use axios to do post request to /saveResults and send gameObj in body
+          axios.post('/saveResults', gameObj)
+            .then((data) => {
+              return data;
+            })
+            .catch((error) => {
+              console.log('post to /saveResults error', error);
+            });          
+
+        }
 
         this.setState({
           winner: data.name,
-          gameOver: true,
-          isActive: false
-        });
-        setTimeout(() => this.props.history.replace('/'), 20000);
-      },
-      seppuku: (data) => {
-        // This method is triggered by a player typing 'seppuku' in the terminal.
-        // So, we appoint their opponent to be the winner.
-
-        console.log('in socketHandlers - seppuku', data);
-        console.log('this.state', this.state);
-        console.log('this.props', this.props);
-
-        this.setState({
-          winner: this.state.opponent.name,
           gameOver: true,
           isActive: false
         });
@@ -212,6 +236,9 @@ export default class Game extends Component {
   commandHandlers() {
     return {
       help: () => {
+        // add the command to the user's command list history
+        this.commandList.addCommand('help');
+
         this.setState(prevState => {
           return {
             commandArray: prevState.commandArray.concat(help),
@@ -230,6 +257,9 @@ export default class Game extends Component {
         });
       },
       choose: (pokemonToSwap) => {
+        // add the command to the user's command list history
+        this.commandList.addCommand('choose ' + pokemonToSwap);
+
         let isAvailable = false;
         let index;
         let health;
@@ -254,21 +284,86 @@ export default class Game extends Component {
       },
       seppuku: () => {
         let opponentName = this.state.opponent.name;
-        console.log('You surrendered. This person wins: ', opponentName);
         this.state.socket.emit('seppuku', {
           gameid: this.props.match.params.gameid,
           name: opponentName
+        });
+      },
+      nextCommand: () => {
+        let newInputText; // declare here, due to scope
+        if (this.state.commandInput === '') { // if the current terminal input text is ''
+          const command = this.commandList.getRecentCommand();
+          // then ensure that the new terminal input text is NOT ''
+          newInputText = (command !== '') ? command : this.commandList.getRecentCommand();
+        } else {
+          newInputText = this.commandList.getRecentCommand();
+        }
+
+        // set the new terminal input text
+        this.setState({
+          'commandInput': newInputText
+        });
+      },
+      prevCommand: () => {
+        let newInputText; // declare here, due to scope
+        if (this.state.commandInput === '') { // if the current terminal input text is ''
+          const command = this.commandList.getOldCommand();
+          // then ensure that the new terminal input text is NOT ''
+          newInputText = (command !== '') ? command : this.commandList.getOldCommand();
+        } else {
+          newInputText = this.commandList.getOldCommand();
+        }
+
+        // set the new terminal input text
+        this.setState({
+          'commandInput': newInputText
         });
       }
     };
   }
 
-
-
   handleCommands(e) {
     let value = e.target.value.toLowerCase();
 
-    if (e.keyCode !== 13) {
+    if (e.keyCode === 38) { // UP ARROW KEY
+      // replace current terminal input with value from command history
+      return this.commandHandlers().nextCommand();
+    } else if (e.keyCode === 40) { // DOWN ARROW KEY
+      // replace current terminal input with value from command history
+      return this.commandHandlers().prevCommand();
+    } else if (e.keyCode === 9) { // TAB KEY
+      // stop the tap keypress from changing the focus
+      e.preventDefault();
+
+      // check the terminal input for values to autocomplete
+      if (matcher(value, 'help')) {
+        this.setState({
+          'commandInput': 'help'
+        });
+      } else if (matcher(value, 'seppuku')) {
+        this.setState({
+          'commandInput': 'seppuku'
+        });
+      } else if (matcher(value, 'attack')) {
+        this.setState({
+          'commandInput': 'attack'
+        });
+      } else if (matcher(value.split(' ')[0], 'choose')) {
+        if (value.split(' ').length > 1) { // if they also have a pokemon name started
+          this.setState({
+            'commandInput': 'choose ' + getTeamMatches(this.state.pokemon, value.split(' ')[1])[0]
+          });
+        } else { // just the command 'choose'
+          this.setState({
+            'commandInput': 'choose'
+          });
+        }
+      } else {
+        // there is no matching command, so there's nothing to autocomplete
+      }
+    }
+
+    if (e.keyCode !== 13) { // If the user did NOT hit the 'enter' key, just return undefined
       return undefined;
     }
 
@@ -287,6 +382,9 @@ export default class Game extends Component {
         if (this.state.pokemon[0].health <= 0) {
           alert('you must choose a new pokemon, this one has fainted!');
         } else {
+          // add the command to the user's command list history
+          this.commandList.addCommand('attack');
+
           this.setState({
             attacking: true
           });
@@ -294,15 +392,7 @@ export default class Game extends Component {
         }
       } else if (matcher(value.split(' ')[0], 'choose')) {
         // handle choosing pokemon here
-        const teamMatches = [];
-        const team = this.state.pokemon;
-
-        // check every member of the team for a match
-        for (let i = 0; i < team.length; i++) {
-          if (matcher(value.split(' ')[1], team[i].name)) {
-            teamMatches.push(team[i].name);
-          }
-        }
+        const teamMatches = getTeamMatches(this.state.pokemon, value.split(' ')[1]);
 
         // use the first match found
         this.commandHandlers().choose(teamMatches[0]);
@@ -326,7 +416,7 @@ export default class Game extends Component {
         </div>
       );
     } else if (this.state.gameOver) {
-      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} />
+      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} />;
     } else {
       return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />;
     }
