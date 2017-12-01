@@ -6,12 +6,30 @@ import Login from './Login.jsx';
 import Chat from './Chat.jsx';
 import Terminal from './Terminal.jsx';
 import GameView from './GameView.jsx';
+import GameHistory from './GameHistory.jsx';
 import GameOverView from './GameOverView.jsx';
 import GameState from './GameState.jsx';
 import Logo from './Logo.jsx';
 import css from '../styles.css';
 
-import help from './../../../utils/helpers.js'
+import help from './../../../utils/helpers.js';
+
+// A helper function for terminal commands, to return true if the source contains the target string
+//   Ex. source -> 'attack' contains the targets -> 'a', 'at', 'att', 'atta', 'attac', and 'attack'
+//   Ex. source -> 'attack' does NOT contain the targets -> 'h', 'he', 'hel', or 'help'
+//   Ex. source -> 'help' does NOT contain the targets -> 'c', 'ch', 'cho', 'choo', 'choos', or 'choose'
+const matcher = (target, source) => {
+  if (target.length < 1) { // if the target is an empty string, don't bother searching
+    return false;
+  } else if (target.length > source.length) { // if the target is longer than the source, it's not a match
+    return false;
+  }
+
+  // search from the beginning of the source
+  //   Ex. This stops the command 'choose f' from selecting wigglytuff
+  //     Presumably, in that instance the user would prefer to get their farfetchd instead
+  return new RegExp(target).test(source.slice(0, (target.length + 1)));
+};
 
 export default class Game extends Component {
   constructor(props) {
@@ -30,27 +48,29 @@ export default class Game extends Component {
       winner: null,
       chatInput: '',
       commandInput: '',
-      commandArray: [{command: `The game will begin shortly - type 'help' to learn how to play`}],
-      socket: null
+      commandArray: [{ command: 'The game will begin shortly - type \'help\' to learn how to play' }],
+      socket: null,
+      showGameHistory: false
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChatInputSubmit = this.handleChatInputSubmit.bind(this);
     this.handleCommands = this.handleCommands.bind(this);
+    this.toggleGameHistory = this.toggleGameHistory.bind(this);
   }
 
   socketHandlers() {
     return {
       handleChat: (message) => {
-      var messageInstance = {
+        var messageInstance = {
           name: message.name,
           text: message.text
-        }
+        };
         this.setState(prevState => {
           return {
             messageArray: prevState.messageArray.concat(messageInstance)
-          }
-        })
+          };
+        });
       },
       playerInitialized: (data) => {
         this.setState({
@@ -71,14 +91,14 @@ export default class Game extends Component {
           });
         }
         this.setState({
-          commandArray: [{command: 'Let the battle begin!'}]
+          commandArray: [{ command: 'Let the battle begin!' }]
         });
       },
       attackProcess: (data) => {
         this.setState(prevState => {
           return {
             commandArray: prevState.commandArray.concat(data.basicAttackDialog)
-          }
+          };
         });
       },
       turnMove: (data) => {
@@ -88,7 +108,7 @@ export default class Game extends Component {
               pokemon: data.player1.pokemon,
               opponent: data.player2,
               isActive: !prevState.isActive
-            }
+            };
           });
         } else {
           this.setState(prevState => {
@@ -96,8 +116,8 @@ export default class Game extends Component {
               pokemon: data.player2.pokemon,
               opponent: data.player1,
               isActive: !prevState.isActive
-            }
-          })
+            };
+          });
         }
       },
       gameOver: (data) => {
@@ -115,10 +135,13 @@ export default class Game extends Component {
           winner: data.name,
           gameOver: true,
           isActive: false
-        }); 
-        setTimeout(() => this.props.history.replace("/"), 20000); 
+        });
+        setTimeout(() => this.props.history.replace('/'), 20000);
       },
       seppuku: (data) => {
+        // This method is triggered by a player typing 'seppuku' in the terminal.
+        // So, we appoint their opponent to be the winner.
+
         console.log('in socketHandlers - seppuku', data);
         console.log('this.state', this.state);
         console.log('this.props', this.props);
@@ -127,10 +150,10 @@ export default class Game extends Component {
           winner: this.state.opponent.name,
           gameOver: true,
           isActive: false
-        }); 
-        setTimeout(() => this.props.history.replace("/"), 20000); 
+        });
+        setTimeout(() => this.props.history.replace('/'), 20000);
       }
-    }
+    };
   }
 
   componentDidMount() {
@@ -142,26 +165,25 @@ export default class Game extends Component {
           this.setState({
             name: username,
             socket
-          })
+          });
           const playerInit = {
             gameid: this.props.match.params.gameid,
             name: username,
             pokemon: this.state.pokemon
-          }
+          };
           socket.emit('join game', playerInit);
-          socket.on('gamefull', message => alert(message)); 
-          socket.on('chat message', this.socketHandlers().handleChat); 
-          socket.on('player', this.socketHandlers().playerInitialized); 
-          socket.on('ready', this.socketHandlers().handleReady); 
-          socket.on('attack processed', this.socketHandlers().attackProcess); 
+          socket.on('gamefull', message => alert(message));
+          socket.on('chat message', this.socketHandlers().handleChat);
+          socket.on('player', this.socketHandlers().playerInitialized);
+          socket.on('ready', this.socketHandlers().handleReady);
+          socket.on('attack processed', this.socketHandlers().attackProcess);
           socket.on('turn move', this.socketHandlers().turnMove);
-          socket.on('gameover', this.socketHandlers().gameOver); 
-          socket.on('seppuku', this.socketHandlers().seppuku); 
+          socket.on('gameover', this.socketHandlers().gameOver);
+          socket.on('seppuku', this.socketHandlers().seppuku);
+        } else {
+          this.props.history.replace('/login');
         }
-        else {
-          this.props.history.replace("/login");
-        }
-      })
+      });
   }
 
   handleInputChange(e, type) {
@@ -177,8 +199,8 @@ export default class Game extends Component {
     if (e.keyCode === 13) {
       var socket = io();
       this.state.socket.emit('chat message', {
-        gameid: this.props.match.params.gameid, 
-        name: this.state.name, 
+        gameid: this.props.match.params.gameid,
+        name: this.state.name,
         text: e.target.value
       });
       this.setState({
@@ -194,8 +216,8 @@ export default class Game extends Component {
           return {
             commandArray: prevState.commandArray.concat(help),
             commandInput: ''
-          }
-        })
+          };
+        });
       },
       attack: () => {
         this.state.socket.emit('attack', {
@@ -204,7 +226,7 @@ export default class Game extends Component {
           pokemon: this.state.pokemon
         });
         this.setState({
-            attacking: false
+          attacking: false
         });
       },
       choose: (pokemonToSwap) => {
@@ -215,7 +237,7 @@ export default class Game extends Component {
           if (poke.name === pokemonToSwap) {
             isAvailable = true;
             index = i;
-            health = poke.health 
+            health = poke.health;
           }
         });
         if (isAvailable && health > 0) {
@@ -223,9 +245,9 @@ export default class Game extends Component {
             gameid: this.props.match.params.gameid,
             pokemon: this.state.pokemon,
             index
-          })
+          });
         } else if (health === 0) {
-          alert('That pokemon has fainted!')
+          alert('That pokemon has fainted!');
         } else {
           alert('You do not have that pokemon!');
         }
@@ -238,46 +260,61 @@ export default class Game extends Component {
           name: opponentName
         });
       }
-    }
+    };
   }
 
 
 
   handleCommands(e) {
-    if (e.keyCode !== 13) return;
-    let value = e.target.value.toLowerCase(); 
+    let value = e.target.value.toLowerCase();
 
-    if (value === 'help') {
-      return this.commandHandlers().help(); 
+    if (e.keyCode !== 13) {
+      return undefined;
     }
 
-    if (value === 'seppuku') {
+    if (matcher(value, 'help')) {
+      return this.commandHandlers().help();
+    }
+
+    if (matcher(value, 'seppuku')) {
       return this.commandHandlers().seppuku();
     }
-    
+
     if (!this.state.isActive) {
       alert('it is not your turn!');
     } else {
-      if (value === 'attack') {
+      if (matcher(value, 'attack')) {
         if (this.state.pokemon[0].health <= 0) {
           alert('you must choose a new pokemon, this one has fainted!');
         } else {
           this.setState({
             attacking: true
-          })
-          setTimeout(() => this.commandHandlers().attack(), 300);  
+          });
+          setTimeout(() => this.commandHandlers().attack(), 300);
         }
-      } else if (value.split(' ')[0] === "choose") {
-        this.commandHandlers().choose(value.split(' ')[1]); 
+      } else if (matcher(value.split(' ')[0], 'choose')) {
+        // handle choosing pokemon here
+        const teamMatches = [];
+        const team = this.state.pokemon;
+
+        // check every member of the team for a match
+        for (let i = 0; i < team.length; i++) {
+          if (matcher(value.split(' ')[1], team[i].name)) {
+            teamMatches.push(team[i].name);
+          }
+        }
+
+        // use the first match found
+        this.commandHandlers().choose(teamMatches[0]);
       } else {
-        alert('invalid input!')
+        alert('invalid input!');
       }
     }
 
     this.setState({
       commandInput: ''
     });
-  
+
   }
 
   renderGame() {
@@ -287,24 +324,35 @@ export default class Game extends Component {
         <div className={css.loading}>
           <h1>Awaiting opponent...</h1>
         </div>
-      )
+      );
     } else if (this.state.gameOver) {
-      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} />
+      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} />
     } else {
-      return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />
+      return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />;
     }
   }
 
   renderSideBar() {
     return (
       <div className={css.stateContainer}>
-        <Logo name={this.state.name} isActive={this.state.isActive} opponent={this.state.opponent} />
+        <Logo name={this.state.name} isActive={this.state.isActive} opponent={this.state.opponent} toggleGameHistory={this.toggleGameHistory} />
         <GameState pokemon={this.state.pokemon} />
-        <Chat messageArray={this.state.messageArray} chatInput={this.state.chatInput} handleChatInputSubmit={this.handleChatInputSubmit} handleInputChange={this.handleInputChange} /> 
+        <Chat messageArray={this.state.messageArray} chatInput={this.state.chatInput} handleChatInputSubmit={this.handleChatInputSubmit} handleInputChange={this.handleInputChange} />
       </div>
     );
   }
 
+  renderGameHistory() {
+    if (this.state.showGameHistory) {
+      return (
+        <GameHistory toggleGameHistory={this.toggleGameHistory} />
+      );
+    }
+  }
+
+  toggleGameHistory() {
+    this.setState({ showGameHistory: !this.state.showGameHistory });
+  }
 
   render() {
     const { players, spectators, gameOver, pokemon } = this.state;
@@ -315,8 +363,9 @@ export default class Game extends Component {
           <Terminal commandArray={this.state.commandArray} commandInput={this.state.commandInput} handleCommands={this.handleCommands} handleInputChange={this.handleInputChange} />
         </div>
         {this.renderSideBar()}
+        {this.renderGameHistory()}
       </div>
-    )
+    );
   }
 }
 
