@@ -33,6 +33,10 @@ export default class Login extends Component {
       });
   }
 
+  componentDidMount() {
+    document.getElementById('usernameField').focus();
+  }
+
   handleUsernameChange(e) {
     this.setState({
       username: e.target.value
@@ -43,6 +47,12 @@ export default class Login extends Component {
     this.setState({
       password: e.target.value
     });
+  }
+
+  handleEnterKey(event) {
+    if (event.key === 'Enter') {
+      this.handleSubmit();
+    }
   }
 
   handleSubmit() {
@@ -91,14 +101,14 @@ export default class Login extends Component {
         usernameField = (
           <div className={css.fieldErrorWrapper}>
             <div className={css.fieldErrorText}>Username does not exist</div>
-            <input type="text" className={css.fieldErrorInput} placeholder="Username"
-              value={this.state.username} onChange={this.handleUsernameChange}></input>
+            <input type="text" id="usernameField" className={css.fieldErrorInput} placeholder="Username"
+              value={this.state.username} onChange={this.handleUsernameChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
           </div>
         );
       } else {
         usernameField = (
-          <input type="text" className={css.signInUpField} placeholder="Username"
-            value={this.state.username} onChange={this.handleUsernameChange}></input>
+          <input type="text" id='usernameField' className={css.signInUpField} placeholder="Username"
+            value={this.state.username} onChange={this.handleUsernameChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
         );
       }
 
@@ -107,13 +117,13 @@ export default class Login extends Component {
           <div className={css.fieldErrorWrapper}>
             <div className={css.fieldErrorText}>Password is incorrect</div>
             <input type="password" className={css.fieldErrorInput} placeholder="Password"
-              value={this.state.password} onChange={this.handlePasswordChange}></input>
+              value={this.state.password} onChange={this.handlePasswordChange} onClick={this.handleSubmit} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
           </div>
         );
       } else {
         passwordField = (
           <input type="password" className={css.signInUpField} placeholder="Password"
-            value={this.state.password} onChange={this.handlePasswordChange}></input>
+            value={this.state.password} onChange={this.handlePasswordChange} onKeyDown={(event) => { this.handleEnterKey(event); }}></input>
         );
       }
 
