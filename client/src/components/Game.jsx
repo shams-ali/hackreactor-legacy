@@ -274,13 +274,33 @@ export default class Game extends Component {
         });
       },
       nextCommand: () => {
+        let newInputText; // declare here, due to scope
+        if (this.state.commandInput === '') { // if the current terminal input text is ''
+          const command = this.commandList.getRecentCommand();
+          // then ensure that the new terminal input text is NOT ''
+          newInputText = (command !== '') ? command : this.commandList.getRecentCommand();
+        } else {
+          newInputText = this.commandList.getRecentCommand();
+        }
+
+        // set the new terminal input text
         this.setState({
-          'commandInput': this.commandList.getNextCommand()
+          'commandInput': newInputText
         });
       },
       prevCommand: () => {
+        let newInputText; // declare here, due to scope
+        if (this.state.commandInput === '') { // if the current terminal input text is ''
+          const command = this.commandList.getOldCommand();
+          // then ensure that the new terminal input text is NOT ''
+          newInputText = (command !== '') ? command : this.commandList.getOldCommand();
+        } else {
+          newInputText = this.commandList.getOldCommand();
+        }
+
+        // set the new terminal input text
         this.setState({
-          'commandInput': this.commandList.getPrevCommand()
+          'commandInput': newInputText
         });
       }
     };
@@ -299,7 +319,7 @@ export default class Game extends Component {
       // TODO: tab to autocomplete
     }
 
-    if (e.keyCode !== 13) { // NOT ENTER KEY
+    if (e.keyCode !== 13) { // If the user did NOT hit the 'enter' key, just return undefined
       return undefined;
     }
 

@@ -35,26 +35,32 @@ const commandHistory = class CommandHistory {
     //            all spaces is an example of a pointless command
     //       3. Stop blacklisted commands from being added
 
-    // make a new node for the new command
-    const newCommand = new Node(command, this.head, this.tail);
+    const commandRemoved = this.remove(command);
 
-    // update the head + tail pointers
-    this.tail.next = newCommand;
-    this.tail = this.tail.next;
-    this.head.prev = this.tail;
+    if ((commandRemoved === true) || (commandRemoved === null)) {
+      // make a new node for the new command
+      const newCommand = new Node(command, this.head, this.tail);
 
-    // reset the current command
-    this.current = this.head;
+      // update the head + tail pointers
+      this.tail.next = newCommand;
+      this.tail = this.tail.next;
+      this.head.prev = this.tail;
+
+      // reset the current command
+      this.current = this.head;
+    } else if (commandRemoved === false) {
+      // It is already at the end, so don't add it to the end
+    }
   }
 
   // Returns true if the target was removed
-  // Returns false if the target was not found
+  // Returns null if the target was not found
+  // Returns false if the target was not removed
   remove(target) {
     // NOTE: Remember that this.head.command is always an empty line, to simulate the default of empty terminal input
     if (this.head.next === this.head) { // if there is only 1 element in this list
       // don't bother removing if no command was ever added
-      return false; // The command probably was not ''
-      //              Also, '' would have been an invalid command, so even if it was that, don't add it
+      return null;
     }
 
     let index = this.head.next;
@@ -62,7 +68,7 @@ const commandHistory = class CommandHistory {
     while (index !== this.head) { // go through the rest of the list
       if (index.command === target) { // if the index node has the target command
         if (this.tail === index) { // check if it's the tail element
-          this.tail = this.tail.prev; // change the tail pointer
+          return false; // it's already at the end, so don't remove or add the command
         }
 
         // remove the item from the list
@@ -74,15 +80,15 @@ const commandHistory = class CommandHistory {
       index = index.next; // check the next item in the list
     }
 
-    return false; // indicate that the item was not found
+    return null; // indicate that the item was not found
   } // end of remove(target)
 
-  getPrevCommand() {
+  getRecentCommand() { // Newest -> Most Recent Commands
     this.current = this.current.prev;
     return this.getCurrentCommand();
   }
 
-  getNextCommand() {
+  getOldCommand() { // Oldest commands
     this.current = this.current.next;
     return this.getCurrentCommand();
   }
