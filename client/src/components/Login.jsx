@@ -28,7 +28,7 @@ export default class Login extends Component {
           this.setState({
             name: username
           });
-          this.props.history.replace("/welcome");
+          this.props.history.replace('/welcome');
         }
       });
   }
@@ -60,53 +60,63 @@ export default class Login extends Component {
           this.setState({
             usernameError: true
           });
-        }
-        else if (resp.data.match('Passwords Do Not Match')) {
+        } else if (resp.data.match('Passwords Do Not Match')) {
           console.log('Passwords Do Not Match');
           this.setState({
             passwordError: true
           });
-        }
-        else {
-          console.log("user found");
+        } else {
+          console.log('user found');
           this.setState({
             registered: true
           });
         }
-      })
+      });
   }
 
   render() {
     if (this.state.registered === false) {
       return (
         <Redirect to="/signup" />
-      )
-    }
-    else if (this.state.registered === true) {
+      );
+    } else if (this.state.registered === true) {
       return (
         <Redirect to="/welcome" />
-      )
-    }
-    else {
+      );
+    } else {
       let usernameField = null;
       let passwordField = null;
 
       if (this.state.usernameError) {
-        usernameField = <div className={css.fieldErrorWrapper}>
-          <div className={css.fieldErrorText}>Username does not exist</div>
-          <input type="text" className={css.fieldErrorInput} placeholder="Username" value={this.state.username} onChange={this.handleUsernameChange}></input>
-        </div>
+        usernameField = (
+          <div className={css.fieldErrorWrapper}>
+            <div className={css.fieldErrorText}>Username does not exist</div>
+            <input type="text" className={css.fieldErrorInput} placeholder="Username"
+              value={this.state.username} onChange={this.handleUsernameChange}></input>
+          </div>
+        );
       } else {
-        usernameField = <input type="text" className={css.signInUpField} placeholder="Username" value={this.state.username} onChange={this.handleUsernameChange}></input>
+        usernameField = (
+          <input type="text" className={css.signInUpField} placeholder="Username"
+            value={this.state.username} onChange={this.handleUsernameChange}></input>
+        );
       }
 
       if (this.state.passwordError) {
-        passwordField = <div className={css.fieldErrorWrapper}>
-          <div className={css.fieldErrorText}>Password is incorrect</div>
-          <input type="password" className={css.fieldErrorInput} placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange}></input>
-        </div>
+        passwordField =
+          (
+            <div className={css.fieldErrorWrapper}>
+              <div className={css.fieldErrorText}>Password is incorrect</div>
+              <input type="password" className={css.fieldErrorInput} placeholder="Password"
+                value={this.state.password} onChange={this.handlePasswordChange}></input>
+            </div>
+          );
       } else {
-        passwordField = <input type="password" className={css.signInUpField} placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange}></input>
+        passwordField =
+          (
+            <input type="password" className={css.signInUpField} placeholder="Password"
+              value={this.state.password} onChange={this.handlePasswordChange}></input>
+          );
       }
 
       return (
@@ -136,7 +146,7 @@ export default class Login extends Component {
             </div>
           </div>
         </div>
-      )
+      );
     }
   }
 }
