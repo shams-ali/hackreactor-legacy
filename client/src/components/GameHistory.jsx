@@ -10,7 +10,7 @@ const GameHistory = (props) => {
       <div className={hist.gamesList}>
         {props.gameHistoryData.map(game => {
           return (
-            <GameHistoryRow game={game} key={game.id} />
+            <GameHistoryRow name={props.name} game={game} key={game.id} />
           );
         })}
       </div>

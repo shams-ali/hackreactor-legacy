@@ -7,7 +7,9 @@ import hist from '../gameHistory.css';
 const GameHistoryRow = (props) => {
   return (
     <div className={hist.row}>
-      <div className={hist.winLoss}>WIN!</div>
+      <div className={hist.winLoss}>
+        {props.name === props.game.winner_name ? 'WIN!' : 'Loss'}
+      </div>
 
       <div className={hist.player}>
         <h3 className={hist.playerName}>{props.game.winner_name}</h3>

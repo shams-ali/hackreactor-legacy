@@ -466,7 +466,7 @@ export default class Game extends Component {
   renderGameHistory() {
     if (this.state.showGameHistory) {
       return (
-        <GameHistory gameHistoryData={this.state.gameHistoryData} toggleGameHistory={this.toggleGameHistory} />
+        <GameHistory name={this.state.name} gameHistoryData={this.state.gameHistoryData} toggleGameHistory={this.toggleGameHistory} />
       );
     }
   }
