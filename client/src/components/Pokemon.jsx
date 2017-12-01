@@ -8,12 +8,32 @@ const Pokemon = (props) => {
     } else {
       return css.staticAnimation;
     }
-  }
+  };
+
+  let bkgdBattle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)'
+  };
+
+  let sprite = {
+    position: 'absolute',
+    top: '30%',
+    left: '50%',
+    transform: 'translate(-50%, -30%)'
+  };
+
+  let containerPokemon = {
+    position: 'relative'
+  };
+
   return (
-    <div>
-      <img className={classes()} src={props.sprite} style={{minWidth: '200px'}} alt="pikachu" />
+    <div style={containerPokemon}>
+      <img style={bkgdBattle} src="/img/bkgd-battle.png"/>
+      <img className={classes()} src={props.sprite} style={sprite}/>
     </div>
-  )
-}
+  );
+};
 
 export default Pokemon;

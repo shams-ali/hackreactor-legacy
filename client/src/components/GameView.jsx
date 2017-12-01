@@ -18,4 +18,4 @@ const GameView = (props) => {
   )
 }
 
-export default GameView; 
+export default GameView;

@@ -333,5 +333,13 @@ body {
 }
 
 .attacked {
-  opacity: 0.3
+  animation: attacked 1s linear once;
+}
+
+@keyframes attacked {
+0% { opacity: 1; }
+18% { opacity: 1; }
+20% { opacity: 0; }
+22% { opacity: 1; }
+100% { opacity: 1; }
 }

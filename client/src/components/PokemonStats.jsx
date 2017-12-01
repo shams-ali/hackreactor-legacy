@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import css from '../PokemonStats.css';
 
-
 const PokemonStats = (props) => {
   let damage = props.stats.health / props.stats.initialHealth;
 
@@ -44,7 +43,7 @@ const PokemonStats = (props) => {
         </div>
       </div>
 
-      <div style={{marginBottom: '2px'}}> {props.stats.health} / {props.stats.initialHealth} </div>
+      <div>{props.stats.health} / {props.stats.initialHealth}</div>
     </div>
   );
 };
