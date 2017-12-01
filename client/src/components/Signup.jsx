@@ -33,7 +33,7 @@ export default class Signup extends Component {
           this.setState({
             name: username
           });
-          this.props.history.replace("/welcome");
+          this.props.history.replace('/welcome');
         }
       });
   }
@@ -76,12 +76,10 @@ export default class Signup extends Component {
     if (!username.match(validator.username)) {
       alert('Username should only conatain latin letters and/or numbers, and be from 3 to 20 characters long');
       return;
-    }
-    else if (!password.match(validator.password)) {
+    } else if (!password.match(validator.password)) {
       alert('Password needs to be at 8-20 characters long and have one number');
       return;
-    }
-    else if (!email.match(validator.email)) {
+    } else if (!email.match(validator.email)) {
       alert('Incorrect email format');
       return;
     }
@@ -95,12 +93,10 @@ export default class Signup extends Component {
       .then(resp => {
         if (typeof resp.data === 'string' && resp.data.match('Email Already Exists')) {
           alert('This email already exists, try again!');
-        }
-        else if (typeof resp.data === 'string' && resp.data.match('Username Already Exists')) {
+        } else if (typeof resp.data === 'string' && resp.data.match('Username Already Exists')) {
           alert('This username already exists, try again!');
-        }
-        else {
-          this.props.history.replace("/welcome");
+        } else {
+          this.props.history.replace('/welcome');
         }
       })
       .catch(err => {
@@ -113,27 +109,41 @@ export default class Signup extends Component {
     let usernameField = null;
     let emailField = null;
     let passwordError = this.state.matchingPasswordError
-      ? <div className={css.fieldErrorWrapper}>
-        <div className={css.fieldErrorText}>Passwords are not the same</div>
-      </div>
+      ? (
+        <div className={css.fieldErrorWrapper}>
+          <div className={css.fieldErrorText}>Passwords are not the same</div>
+        </div>
+      )
       : null;
 
     if (this.state.usernameUniqueError) {
-      usernameField = <div className={css.fieldErrorWrapper}>
-        <div className={css.fieldErrorText}>Username already exists</div>
-        <input type="text" className={css.fieldErrorInput} placeholder="Username" value={this.state.username} onChange={this.handleUsernameChange}></input>
-      </div>
+      usernameField = (
+        <div className={css.fieldErrorWrapper}>
+          <div className={css.fieldErrorText}>Username already exists</div>
+          <input type="text" className={css.fieldErrorInput} placeholder="Username"
+            value={this.state.username} onChange={this.handleUsernameChange}></input>
+        </div>
+      );
     } else {
-      usernameField = <input type="text" className={css.signInUpField} placeholder="Username" value={this.state.username} onChange={this.handleUsernameChange}></input>
+      usernameField = (
+        <input type="text" className={css.signInUpField} placeholder="Username"
+          value={this.state.username} onChange={this.handleUsernameChange}></input>
+      );
     }
 
     if (this.state.emailUniqueError) {
-      emailField = <div className={css.fieldErrorWrapper}>
-        <div className={css.fieldErrorText}>Email has an account already</div>
-        <input type="text" className={css.fieldErrorInput} placeholder="Email" value={this.state.email} onChange={this.handleEmailChange}></input>
-      </div>
+      emailField = (
+        <div className={css.fieldErrorWrapper}>
+          <div className={css.fieldErrorText}>Email has an account already</div>
+          <input type="text" className={css.fieldErrorInput} placeholder="Email"
+            value={this.state.email} onChange={this.handleEmailChange}></input>
+        </div>
+      );
     } else {
-      emailField = <input type="text" className={css.signInUpField} placeholder="Email" value={this.state.email} onChange={this.handleEmailChange}></input>
+      emailField = (
+        <input type="text" className={css.signInUpField} placeholder="Email"
+          value={this.state.email} onChange={this.handleEmailChange}></input>
+      );
     }
 
 
@@ -164,6 +174,6 @@ export default class Signup extends Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }

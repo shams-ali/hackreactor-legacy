@@ -103,20 +103,18 @@ export default class Login extends Component {
       }
 
       if (this.state.passwordError) {
-        passwordField =
-          (
-            <div className={css.fieldErrorWrapper}>
-              <div className={css.fieldErrorText}>Password is incorrect</div>
-              <input type="password" className={css.fieldErrorInput} placeholder="Password"
-                value={this.state.password} onChange={this.handlePasswordChange}></input>
-            </div>
-          );
-      } else {
-        passwordField =
-          (
-            <input type="password" className={css.signInUpField} placeholder="Password"
+        passwordField = (
+          <div className={css.fieldErrorWrapper}>
+            <div className={css.fieldErrorText}>Password is incorrect</div>
+            <input type="password" className={css.fieldErrorInput} placeholder="Password"
               value={this.state.password} onChange={this.handlePasswordChange}></input>
-          );
+          </div>
+        );
+      } else {
+        passwordField = (
+          <input type="password" className={css.signInUpField} placeholder="Password"
+            value={this.state.password} onChange={this.handlePasswordChange}></input>
+        );
       }
 
       return (
