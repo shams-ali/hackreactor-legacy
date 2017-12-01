@@ -136,10 +136,10 @@ export default class Game extends Component {
         // We don't do this in the opponent's instance because we don't want to create a duplicate row in the db.
         if (this.state.name === data.name) {
           const gameObj = {
-            winner_name: this.state.opponent.name,
-            winner_pokemon: this.state.opponent.pokemon,
-            loser_name: this.state.name,
-            loser_pokemon: this.state.pokemon
+            winner_name: this.state.name,
+            winner_pokemon: this.state.pokemon,
+            loser_name: this.state.opponent.name,
+            loser_pokemon: this.state.opponent.pokemon
           };
 
           // use axios to do post request to /saveResults and send gameObj in body
