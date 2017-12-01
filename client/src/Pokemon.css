@@ -1,0 +1,36 @@
+.attackAnimation {
+  padding-left: 30px;
+}
+.attackAnimation {
+  padding-left: 0;
+}
+
+.attacked {
+  animation: attacked 1s linear once;
+}
+
+@keyframes attacked {
+0% { opacity: 1; }
+18% { opacity: 1; }
+20% { opacity: 0; }
+22% { opacity: 1; }
+100% { opacity: 1; }
+}
+
+/*.gameOver .bkgdBattle {
+  display: none;
+}
+
+.gameOver .reposition {
+  position: static;
+  top: auto;
+  left: auto;
+  transform: none;
+}*/
+
+/*.sprite {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -30%);
+}*/
