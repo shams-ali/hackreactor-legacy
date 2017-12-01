@@ -327,19 +327,3 @@ body {
   display: flex;
   justify-content: space-between;
 }
-
-.attackAnimation {
-  padding-left: 30px;
-}
-
-.attacked {
-  animation: attacked 1s linear once;
-}
-
-@keyframes attacked {
-0% { opacity: 1; }
-18% { opacity: 1; }
-20% { opacity: 0; }
-22% { opacity: 1; }
-100% { opacity: 1; }
-}

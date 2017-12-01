@@ -174,7 +174,7 @@ export default class Game extends Component {
           gameOver: true,
           isActive: false
         });
-        setTimeout(() => this.props.history.replace('/'), 20000);
+        setTimeout(() => this.props.history.replace('/'), 200000);
       }
     };
   }
@@ -411,7 +411,7 @@ export default class Game extends Component {
   }
 
   renderGame() {
-    const { pokemon, opponent, winner, name, attacking } = this.state;
+    const { gameOver, pokemon, opponent, winner, name, attacking } = this.state;
     if (!this.state.opponent) {
       return (
         <div className={css.loading}>
@@ -419,7 +419,7 @@ export default class Game extends Component {
         </div>
       );
     } else if (this.state.gameOver) {
-      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} />;
+      return <GameOverView pokemon={winner === name ? pokemon : opponent.pokemon} winner={winner} toggleGameHistory={this.toggleGameHistory} gameOver={gameOver}/>;
     } else {
       return <GameView opponent={opponent} pokemon={pokemon} attacking={attacking} />;
     }
