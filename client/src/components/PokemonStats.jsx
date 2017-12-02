@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import css from '../PokemonStats.css';
 
+const pokemonTypesAnimations = {
+
+};
+
 const PokemonStats = (props) => {
-  let damage = props.stats.health / props.stats.initialHealth;
+  const damage = props.stats.health / props.stats.initialHealth;
 
   let healthPoints = {
     'height': '20px',
@@ -31,6 +35,14 @@ const PokemonStats = (props) => {
     healthDamage.transition = 'all 0.25s ease';
     healthDamage.borderRadius = '20px 0 0 20px';
   }
+
+  let pokemonTypes = props.stats.types;
+
+  // pokemonTypes.forEach((type, index) => {
+  //   if (type) {
+  //     console.log('POKEMON TYPE HERE => ', type);
+  //   }
+  // });
 
   return (
     <div className={css.stats}>
