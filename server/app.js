@@ -8,9 +8,10 @@ const path = require('path');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const db = require('../database/db.js');
-const bodyParser = require('body-parser');
 const Promise = require('bluebird');
+const db = require('../database/db.js');
+const Sequelize = require('sequelize');
+const bodyParser = require('body-parser');
 const bcrypt = Promise.promisifyAll(require('bcrypt'));
 const saltRounds = 10;
 const cookieParser = require('cookie-parser');
@@ -23,9 +24,15 @@ const Lobby = require('./helpers/Lobby');
 
 const dist = path.join(__dirname, '/../client/dist');
 
+
+
 /* ======================== MIDDLEWARE ======================== */
 
-app.use(bodyParser());
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+// parse application/json
+app.use(bodyParser.json());
+
 app.use(express.static(dist));
 
 app.use(cookieParser());
@@ -89,6 +96,22 @@ const lobbies = {
   squirtle: new Lobby('squirtle'),
 };
 
+const lobbyUsers = {}; // Map sockets to lobbies
+const socketUsers = {}; // Map users to sockets
+
+const removeLobbyUsersById = (ids) => {
+  for (let id of ids) {
+    const lobby = lobbyUsers[id];
+
+    if (lobby) {
+      const name = lobby.getUserById(id);
+      lobby.removeUserById(id);
+      delete lobbyUsers[id];
+      delete socketUsers[name];
+    }
+  }
+};
+
 /* =============================================================== */
 
 
@@ -101,7 +124,6 @@ io.on('connection', (socket) => {
   const emitMap = (lobby) => {
     lobby.getIds().forEach((id) => {
       io.to(id).emit('lobby update', {
-        lobby: lobby.getLobbyName(),
         users: lobby.getUserData(),
         map: lobby.getMap(),
       });
@@ -116,6 +138,8 @@ io.on('connection', (socket) => {
     for (let lobby of Object.values(lobbies)) {
       if (!lobby.isFull() && !lobby.hasUser(name)) {
         lobby.addUser(name, socket.id);
+        lobbyUsers[socket.id] = lobby;
+        socketUsers[name] = socket.id;
         emitMap(lobby);
 
         break;
@@ -123,9 +147,38 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('lobby move', ({ lobby, dir }) => {
-    lobbies[lobby].move(socket.id, dir);
-    emitMap(lobbies[lobby]);
+  socket.on('lobby move', ({ dir }) => {
+    const lobby = lobbyUsers[socket.id];
+
+    if (lobby) {
+      lobby.move(socket.id, dir);
+      emitMap(lobby);
+    }
+  });
+
+  socket.on('lobby interact', ({ target }) => {
+    const lobby = lobbyUsers[socket.id];
+
+    // Checked on client-side but server should confirm availability
+    if (lobby && lobby.getUserStatus(target) === 'available') {
+      const targetId = socketUsers[target];
+
+      // io.to(socket.id).emit('lobby wait', { type: 'challenge', target: target });
+      io.to(targetId).emit('challenge request', { from: lobby.getUserById(socket.id) });
+    }
+  });
+
+  socket.on('challenge accept', ({ from }) => {
+    const lobby = lobbyUsers[socket.id];
+    const challenger = socketUsers[from];
+    const opponent = lobby.getUserById(socket.id);
+    const gameId = `${lobby.getLobbyName()}_${from}_VS_${opponent}`.toUpperCase();
+
+    io.to(socket.id).emit('challenge start', { gameId });
+    setTimeout(() => io.to(challenger).emit('challenge start', { gameId }), 420);
+
+    // Sample remove users from lobby
+    removeLobbyUsersById([socket.id, challenger]);
   });
 
   /* socket.on('join game')
@@ -191,7 +244,20 @@ io.on('connection', (socket) => {
       ) {
         game[opponent].pokemon[0].health = 0;
         io.to(data.gameid).emit('turn move', game);
-        io.to(data.gameid).emit('gameover', { name: game[player].name });
+        // Save game data
+        let gameObj = {
+          winner_name: game[player].name,
+          winner_pokemon: game[player].pokemon,
+          loser_name: game[opponent].name,
+          loser_pokemon: game[opponent].pokemon
+        };
+        db.saveWinLoss(gameObj, function (err, response) {
+          if (err) {
+            console.log('Save game data error:', err);
+          }
+          // Emit 'gameover' after data has been saved so this lastest game appears in the Game History list immediately
+          io.to(data.gameid).emit('gameover', { name: game[player].name });
+        });
       } else if (game[opponent].pokemon[0].health <= 0) {
         game[opponent].pokemon[0].health = 0;
         game.playerTurn = opponent;
@@ -217,7 +283,20 @@ io.on('connection', (socket) => {
   });
 
   socket.on('seppuku', data => {
-    io.to(data.gameid).emit('gameover', { name: data.name });
+    // Save game data
+    let gameObj = {
+      winner_name: data.winner_name,
+      winner_pokemon: data.winner_pokemon,
+      loser_name: data.loser_name,
+      loser_pokemon: data.loser_pokemon
+    };
+    db.saveWinLoss(gameObj, function (err, response) {
+      if (err) {
+        console.log('Save game data error:', err);
+      }
+      // Emit 'gameover' after data has been saved so this lastest game appears in the Game History list immediately
+      io.to(data.gameid).emit('gameover', { name: data.winner_name });
+    });
   });
 
 });
@@ -232,8 +311,10 @@ app.post('/login', (req, resp) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  db.Users
-    .findOne({ where: { username } })
+  db.Users.findOne({
+    // make the username search case INsensitive
+    where: Sequelize.where(Sequelize.fn('lower', Sequelize.col('username')), username.toLowerCase())
+  })
     .then(user => {
       // finds user
       // not found => end resp
@@ -323,6 +404,15 @@ app.get('/logout', (req, resp) => {
 /* =============================================================== */
 
 /* =============== WIN / LOSS RESULTS ================= */
+
+app.get('/gameHistory', (req, resp) => {
+  db.getWinLoss(req.query.playerName, function (err, data) {
+    if (err) {
+      resp.status(404).send(err);
+    }
+    resp.status(200).send(JSON.stringify(data));
+  });
+});
 
 app.post('/saveResults', (req, resp) => {
   db.saveWinLoss(req.body, function (err, data) {

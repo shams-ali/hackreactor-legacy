@@ -70,12 +70,14 @@ export default class Game extends Component {
       commandInput: '',
       commandArray: [{ command: 'The game will begin shortly - type \'help\' to learn how to play' }],
       socket: null,
-      showGameHistory: false
+      showGameHistory: false,
+      gameHistoryData: []
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChatInputSubmit = this.handleChatInputSubmit.bind(this);
     this.handleCommands = this.handleCommands.bind(this);
+    this.getGameHistory = this.getGameHistory.bind(this);
     this.toggleGameHistory = this.toggleGameHistory.bind(this);
 
     // keeps track of the user's terminal commands for easy future use with Up/Down arrow keys
@@ -144,39 +146,26 @@ export default class Game extends Component {
         }
       },
       gameOver: (data) => {
-        // 'data' just contains the name of the winner
-        // If this method is triggered by this player's 'attack' command, we appoint this player the winner.
-        // If this method is triggered by this player typing 'seppuku' in the terminal, we appoint the opponent the winner.
-
-        // If this player is the winner, save game data to the db.
-        // We don't do this in the opponent's instance because we don't want to create a duplicate row in the db.
-        if (this.state.name === data.name) {
-          const gameObj = {
-            winner_name: this.state.name,
-            winner_pokemon: this.state.pokemon,
-            loser_name: this.state.opponent.name,
-            loser_pokemon: this.state.opponent.pokemon
-          };
-
-          // use axios to do post request to /saveResults and send gameObj in body
-          axios.post('/saveResults', gameObj)
-            .then((data) => {
-              return data;
-            })
-            .catch((error) => {
-              console.log('post to /saveResults error', error);
-            });
-
-        }
-
+        this.getGameHistory();
         this.setState({
           winner: data.name,
           gameOver: true,
           isActive: false
         });
-        setTimeout(() => this.props.history.replace('/'), 200000);
+        // 30 seconds
+        setTimeout(() => this.props.history.replace('/'), 30000);
       }
     };
+  }
+
+  getGameHistory(playerName = this.state.name) {
+    axios(`/gameHistory?playerName=${playerName}`)
+      .then((gameHistoryData) => {
+        this.setState({ gameHistoryData: gameHistoryData.data });
+      })
+      .catch((error) => {
+        console.log('Error getting Game History: ', error);
+      });
   }
 
   componentDidMount() {
@@ -189,6 +178,7 @@ export default class Game extends Component {
             name: username,
             socket
           });
+          this.getGameHistory(data.username);
           const playerInit = {
             gameid: this.props.match.params.gameid,
             name: username,
@@ -291,10 +281,12 @@ export default class Game extends Component {
           'commandInput': ''
         });
 
-        let opponentName = this.state.opponent.name;
         this.state.socket.emit('seppuku', {
           gameid: this.props.match.params.gameid,
-          name: opponentName
+          winner_name: this.state.opponent.name,
+          winner_pokemon: this.state.opponent.pokemon,
+          loser_name: this.state.name,
+          loser_pokemon: this.state.pokemon
         });
       },
       nextCommand: () => {
@@ -311,8 +303,17 @@ export default class Game extends Component {
         this.setState({
           'commandInput': newInputText
         });
+
+        // Move the cursor to the end of the text input when an old command is brought up
+        // Have to use setTimeout to ensure that this occurs after the commandInput text is set by React
+        setTimeout(() => {
+          const textArea = document.getElementsByTagName('textArea')[0];
+          textArea.selectionStart = textArea.selectionEnd = this.state.commandInput.length;
+        }, 0);
       },
       prevCommand: () => {
+        // since this is triggered by the down arrow key the cursor is already at the end of the text input
+
         let newInputText; // declare here, due to scope
         if (this.state.commandInput === '') { // if the current terminal input text is ''
           const command = this.commandList.getOldCommand();
@@ -453,7 +454,7 @@ export default class Game extends Component {
   renderGameHistory() {
     if (this.state.showGameHistory) {
       return (
-        <GameHistory toggleGameHistory={this.toggleGameHistory} />
+        <GameHistory name={this.state.name} gameHistoryData={this.state.gameHistoryData} toggleGameHistory={this.toggleGameHistory} />
       );
     }
   }

@@ -1,14 +1,14 @@
 const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize(process.env.DB_DATABASE, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
-    dialect:  'postgres',
-    protocol: 'postgres',
-    port:     process.env.DB_PORT,
-    host:     process.env.DB_HOST,
-    logging: false,
-    dialectOptions: {
-        ssl: true
-    }
+  dialect: 'postgres',
+  protocol: 'postgres',
+  port: process.env.DB_PORT,
+  host: process.env.DB_HOST,
+  logging: false,
+  dialectOptions: {
+    ssl: true
+  }
 });
 
 sequelize
@@ -20,51 +20,54 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
-const Users = sequelize.define('userito', {
+const Users = sequelize.define('userito',
+  {
     id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
+      type: Sequelize.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
     },
     username: Sequelize.STRING,
     password: Sequelize.STRING,
     email: Sequelize.STRING
-  }
-  , {
+  },
+  {
     timestamps: false
   });
 
-const Pokemon = sequelize.define('pokerito', {
-  id: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    unique: true
+const Pokemon = sequelize.define('pokerito',
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      unique: true
+    },
+    name: Sequelize.STRING,
+    types: Sequelize.ARRAY(Sequelize.TEXT),
+    baseHealth: Sequelize.INTEGER,
+    baseAttack: Sequelize.INTEGER,
+    baseDefense: Sequelize.INTEGER,
+    backSprite: Sequelize.STRING,
+    frontSprite: Sequelize.STRING
   },
-  name: Sequelize.STRING,
-  types: Sequelize.ARRAY(Sequelize.TEXT),
-  baseHealth: Sequelize.INTEGER,
-  baseAttack: Sequelize.INTEGER,
-  baseDefense: Sequelize.INTEGER,
-  backSprite: Sequelize.STRING,
-  frontSprite: Sequelize.STRING
-},
   {
     timestamps: false
-});
+  });
 
-const WinLoss = sequelize.define('winlossito', {
-  id: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    unique: true,
-    autoIncrement: true
-  },
-  gameDate: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
-  winner_name: Sequelize.STRING,
-  winner_pokemon: Sequelize.ARRAY(Sequelize.JSONB),
-  loser_name: Sequelize.STRING,
-  loser_pokemon: Sequelize.ARRAY(Sequelize.JSONB)
-});
+const WinLoss = sequelize.define('winlossito',
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      unique: true,
+      autoIncrement: true
+    },
+    gameDate: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
+    winner_name: Sequelize.STRING,
+    winner_pokemon: Sequelize.ARRAY(Sequelize.JSONB),
+    loser_name: Sequelize.STRING,
+    loser_pokemon: Sequelize.ARRAY(Sequelize.JSONB)
+  });
 
 // Create the tables in the DB
 Users.sync();
@@ -77,48 +80,70 @@ WinLoss.sync();
 //     console.log('all users')
 //     console.log(allUsers)
 //   })
-const saveUser = (username, password, email) =>  {
+const saveUser = (username, password, email) => {
   return Users
     .findOne({ where: { username } })
     .then(userFound => {
-      if (userFound) return 'Username Already Exists';
-      else return Users
-        .findOne({ where: { email } })
+      if (userFound) {
+        return 'Username Already Exists';
+      } else {
+        return Users.findOne({ where: { email } });
+      }
     })
     .then(userFoundOrUsernameExists => {
       if (userFoundOrUsernameExists) {
-        return userFoundOrUsernameExists === 'Username Already Exists'  ?
-        'Username Already Exists':
-        'Email Already Exists';
+        return userFoundOrUsernameExists === 'Username Already Exists' ?
+          'Username Already Exists' :
+          'Email Already Exists';
+      } else {
+        return Users.create({ username, password, email });
       }
-      else return Users.create({ username, password, email });
-    })
+    });
 };
 
 const savePokemon = (pokemonObj) => {
-  console.log('IN SAVE POKEMON!');
   Pokemon.create(pokemonObj).then((data) => {
-    // console.log('DATA: ', data);
-    console.log('POKEMON SAVED TO DB!')
+    console.log('POKEMON SAVED TO DB!');
   })
-  .catch((err) => {
-    console.log('POKEMON SAVED ERROR: ', err);
-  });
+    .catch((err) => {
+      console.log('POKEMON SAVED ERROR: ', err);
+    });
+};
+
+const getWinLoss = (playerName, callback) => {
+  WinLoss.findAll({
+    raw: true,
+    attributes: ['id', 'winner_name', 'winner_pokemon', 'loser_name', 'loser_pokemon'],
+    where: {
+      [Sequelize.Op.or]: [{ winner_name: playerName }, { loser_name: playerName }]
+    },
+    limit: 10,
+    order: sequelize.literal('id DESC')
+  })
+    .then((gameHistoryData) => {
+      callback(null, gameHistoryData);
+    })
+    .catch((err) => {
+      console.log('GET GAME HISTORY ERROR: ', err);
+      callback(err, null);
+    });
 };
 
 const saveWinLoss = (gameObj, callback) => {
-  WinLoss.create(gameObj).then((data) => {
-    callback(null, data);
-  })
-  .catch((err) => {
-    console.log('WIN/LOSS SAVE ERROR: ', err);
-    callback(err, null);
-  });
+  WinLoss.create(gameObj)
+    .then((data) => {
+      callback(null, data);
+    })
+    .catch((err) => {
+      console.log('WIN/LOSS SAVE ERROR: ', err);
+      callback(err, null);
+    });
 };
 
 module.exports = {
   connecttion: sequelize,
   saveUser: saveUser,
+  getWinLoss: getWinLoss,
   saveWinLoss: saveWinLoss,
   Users: Users,
   Pokemon: Pokemon
