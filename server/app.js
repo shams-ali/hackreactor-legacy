@@ -238,6 +238,7 @@ io.on('connection', (socket) => {
         game[opponent].pokemon[0].health = 0;
         io.to(data.gameid).emit('turn move', game);
         io.to(data.gameid).emit('gameover', { name: game[player].name });
+
       } else if (game[opponent].pokemon[0].health <= 0) {
         game[opponent].pokemon[0].health = 0;
         game.playerTurn = opponent;
@@ -263,7 +264,25 @@ io.on('connection', (socket) => {
   });
 
   socket.on('seppuku', data => {
-    io.to(data.gameid).emit('gameover', { name: data.name });
+    console.log('app.js - socket seppuku', data.gameid);
+
+    // Save game data
+    let gameObj = {
+      winner_name: data.winner_name,
+      winner_pokemon: data.winner_pokemon,
+      loser_name: data.loser_name,
+      loser_pokemon: data.loser_pokemon
+    };
+
+    db.saveWinLoss(gameObj, function (err, response) {
+      if (err) {
+        console.log('Save game data error:', err);
+      }
+      console.log('app.js - socket seppuku - db save successful');
+      // Emit 'gameover' after data has been saved so this lastest game appears in the Game History list immediately
+      io.to(data.gameid).emit('gameover', { name: data.winner_name });
+    });
+
   });
 
 });

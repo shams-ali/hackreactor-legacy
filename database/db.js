@@ -120,14 +120,16 @@ const getWinLoss = (playerName, callback) => {
       callback(null, gameHistoryData);
     })
     .catch((err) => {
-      console.log('db.js GET GAME HISTORY ERROR: ', err);
+      console.log('GET GAME HISTORY ERROR: ', err);
       callback(err, null);
     });
 };
 
 const saveWinLoss = (gameObj, callback) => {
+  console.log('db.js - inside saveWinLoss');
   WinLoss.create(gameObj)
     .then((data) => {
+      console.log('db.js - saveWinLoss - create successful');
       callback(null, data);
     })
     .catch((err) => {

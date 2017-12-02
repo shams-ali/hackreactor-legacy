@@ -152,23 +152,26 @@ export default class Game extends Component {
 
         // If this player is the winner, save game data to the db.
         // We don't do this in the opponent's instance because we don't want to create a duplicate row in the db.
-        if (this.state.name === data.name) {
-          const gameObj = {
-            winner_name: this.state.name,
-            winner_pokemon: this.state.pokemon,
-            loser_name: this.state.opponent.name,
-            loser_pokemon: this.state.opponent.pokemon
-          };
 
-          // use axios to do post request to /saveResults and send gameObj in body
-          axios.post('/saveResults', gameObj)
-            .then((data) => {
-              return data;
-            })
-            .catch((error) => {
-              console.log('post to /saveResults error', error);
-            });
-        }
+        // if (this.state.name === data.name) {
+        //   const gameObj = {
+        //     winner_name: this.state.name,
+        //     winner_pokemon: this.state.pokemon,
+        //     loser_name: this.state.opponent.name,
+        //     loser_pokemon: this.state.opponent.pokemon
+        //   };
+
+        //   // use axios to do post request to /saveResults and send gameObj in body
+        //   axios.post('/saveResults', gameObj)
+        //     .then((data) => {
+        //       return data;
+        //     })
+        //     .catch((error) => {
+        //       console.log('post to /saveResults error', error);
+        //     });
+        // }
+        console.log('Game.jsx - gameOver');
+        this.getGameHistory();
 
         this.setState({
           winner: data.name,
@@ -180,7 +183,8 @@ export default class Game extends Component {
     };
   }
 
-  getGameHistory(playerName) {
+  getGameHistory(playerName = this.state.name) {
+console.log('Game.jsx - getGameHistory', playerName);
     axios(`/gameHistory?playerName=${playerName}`)
       .then((gameHistoryData) => {
         this.setState({ gameHistoryData: gameHistoryData.data });
@@ -303,10 +307,12 @@ export default class Game extends Component {
           'commandInput': ''
         });
 
-        let opponentName = this.state.opponent.name;
         this.state.socket.emit('seppuku', {
           gameid: this.props.match.params.gameid,
-          name: opponentName
+          winner_name: this.state.opponent.name,
+          winner_pokemon: this.state.opponent.pokemon,
+          loser_name: this.state.name,
+          loser_pokemon: this.state.pokemon
         });
       },
       nextCommand: () => {
