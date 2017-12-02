@@ -2,6 +2,7 @@ import React, { Component, } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
 
+import Avatar from './Avatar.jsx';
 import styles from '../lobby.css';
 
 export default class Lobby extends Component {
@@ -134,26 +135,25 @@ export default class Lobby extends Component {
     const { users, map } = this.state;
 
     return (
-      <div>
+      <div className={styles.lobby}>
         {map.map((row, rowId) => (
           <div key={rowId} className={styles.row}>
-            {row.map((col, colId) => {
-              return (
-                <div key={colId} className={styles.grass}></div>
-              );
-            })}
+            {row.map((col, colId) => (
+              <div key={colId} className={styles.grass}></div>
+            ))}
           </div>
         ))}
 
         {Object.entries(users).map(([ name, data ]) => {
           const { position, direction } = data;
           const style = {
-            position: 'absolute',
-            left: position[1] * 34,
-            top: position[0] * 32,
+            left: position[1] * 48,
+            top: position[0] * 48,
           };
 
-          return <div key={name} className={styles[`player-${direction}`]} style={style}></div>;
+          return (
+            <Avatar name={name} style={style} direction={direction} />
+          );
         })}
       </div>
     );

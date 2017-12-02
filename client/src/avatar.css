@@ -1,0 +1,77 @@
+.player {
+  position: absolute;
+  display: inline-block;
+  animation-timing-function: step-end;
+  animation-duration: .420s;
+  height: 48px;
+  width: 48px;
+  background: url(/assets/trainer.png) 0 0 no-repeat;
+  background-size: 576px 576px;
+  transition: all .420s linear;
+}
+
+@keyframes walk-up {
+  0%, 100% { background-position: 0px 0px; }
+  33% { background-position: calc(-1 * 48px) 0px; }
+  66% { background-position: calc(-2 * 48px) 0px; }
+}
+
+@keyframes walk-down {
+  0%, 100% { background-position: 0px calc(-2 * 48px); }
+  33% { background-position: calc(-1 * 48px) calc(-2 * 48px); }
+  66% { background-position: calc(-2 * 48px) calc(-2 * 48px); }
+}
+
+@keyframes walk-left {
+  0%, 100% { background-position: 0px calc(-1 * 48px); }
+  33% { background-position: calc(-1 * 48px) calc(-1 * 48px); }
+  66% { background-position: calc(-2 * 48px) calc(-1 * 48px); }
+}
+
+@keyframes walk-right {
+  0%, 100% { background-position: 0px calc(-3 * 48px); }
+  33% { background-position: calc(-1 * 48px) calc(-3 * 48px); }
+  66% { background-position: calc(-2 * 48px) calc(-3 * 48px); }
+}
+
+.player-up {
+  composes: player;
+}
+
+.player-up-animate {
+  composes: player;
+  animation-name: walk-up;
+}
+
+.player-down {
+  composes: player;
+  background-position: 0px calc(-2 * 48px);
+}
+
+.player-down-animate {
+  composes: player;
+  background-position: 0px calc(-2 * 48px);
+  animation-name: walk-down;
+}
+
+.player-left {
+  composes: player;
+  background-position: 0px calc(-1 * 48px);
+}
+
+.player-left-animate {
+  composes: player;
+  background-position: 0px calc(-1 * 48px);
+  animation-name: walk-left;
+}
+
+.player-right {
+  composes: player;
+  background-position: 0px calc(-3 * 48px);
+}
+
+.player-right-animate {
+  composes: player;
+  background-position: 0px calc(-3 * 48px);
+  animation-name: walk-right;
+}
