@@ -26,6 +26,7 @@ class Lobby {
     this.users[name] = {
       position: this._spawnToMap(name),
       direction: 'down',
+      status: 'available',
     };
   }
 
@@ -35,6 +36,18 @@ class Lobby {
 
   getUserData() {
     return this.users;
+  }
+
+  getUserStatus(name) {
+    if (this.users[name]) {
+      return this.users[name].status;
+    }
+  }
+
+  setUserStatus(name, status = 'available') {
+    if (this.users[name] && new Set(['available', 'battling']).has(status)) {
+      this.users[name].status = status;
+    }
   }
 
   getIds() {

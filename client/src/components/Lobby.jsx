@@ -11,9 +11,10 @@ export default class Lobby extends Component {
     this.state = {
       name: null,
       socket: null,
-      lobby: null,
       users: {},
       map: [[]],
+      waiting: false,
+      waitFor: null,
     };
   }
 
@@ -33,7 +34,10 @@ export default class Lobby extends Component {
           });
 
           socket.emit('join lobby', { name: username });
-          socket.on('lobby update', this.handleUpdateLobby.bind(this));
+          socket.on('lobby update', this.handleLobbyUpdate.bind(this));
+          socket.on('lobby wait', this.handleLobbyWait.bind(this));
+          socket.on('challenge request', this.handleLobbyChallenge.bind(this));
+          socket.on('challenge start', this.handleLobbyToGame.bind(this));
 
         } else {
           this.props.history.replace('/login');
@@ -45,34 +49,85 @@ export default class Lobby extends Component {
   }
 
   handleKeydown(event) {
-    const { socket, lobby } = this.state;
+    const { socket, map, name, users, waiting } = this.state;
+
+    if (waiting) {
+      console.log('You are waiting');
+      return;
+    }
 
     switch (event.key.toLowerCase()) {
     case 'w':
     case 'arrowup':
-      socket.emit('lobby move', { lobby: lobby, dir: 'up' });
+      socket.emit('lobby move', { dir: 'up' });
       break;
 
     case 'a':
     case 'arrowleft':
-      socket.emit('lobby move', { lobby: lobby, dir: 'left' });
+      socket.emit('lobby move', { dir: 'left' });
       break;
 
     case 's':
     case 'arrowdown':
-      socket.emit('lobby move', { lobby: lobby, dir: 'down' });
+      socket.emit('lobby move', { dir: 'down' });
       break;
 
     case 'd':
     case 'arrowright':
-      socket.emit('lobby move', { lobby: lobby, dir: 'right' });
+      socket.emit('lobby move', { dir: 'right' });
+      break;
+
+    case ' ':
+    case 'j':
+    case 'enter':
+      let { position: [ r, c ], direction } = users[name];
+
+      switch (direction) {
+      case 'up': --r;
+        break;
+      case 'down': ++r;
+        break;
+      case 'left': --c;
+        break;
+      case 'right': ++c;
+        break;
+      }
+
+      const target = map[r][c];
+
+      if (target) {
+        const { status } = users[target];
+
+        if (status === 'available') {
+          console.log('interacting with', target);
+          socket.emit('lobby interact', { target });
+
+        } else if (status === 'battling') {
+          console.log('Cool! A battle!');
+        }
+      }
       break;
     }
   }
 
-  // TODO: separate lobby, user and map updates
-  handleUpdateLobby({ lobby, users, map }) {
-    this.setState({ lobby, users, map });
+  handleLobbyChallenge({ from }) {
+    // Auto-accept for now
+    this.state.socket.emit('challenge accept', { from });
+  }
+
+  handleLobbyUpdate({ users, map }) {
+    this.setState({ users, map });
+  }
+
+  handleLobbyWait(data) {
+    this.setState({
+      waiting: true,
+      waitFor: data,
+    });
+  }
+
+  handleLobbyToGame({ gameId }) {
+    this.props.history.replace(`/game/${gameId}`);
   }
 
   render() {
