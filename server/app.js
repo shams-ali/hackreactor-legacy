@@ -89,8 +89,21 @@ const lobbies = {
   squirtle: new Lobby('squirtle'),
 };
 
-// Map sockets to lobbies
-const lobbyUsers = {};
+const lobbyUsers = {}; // Map sockets to lobbies
+const socketUsers = {}; // Map users to sockets
+
+const removeLobbyUsersById = (ids) => {
+  for (let id of ids) {
+    const lobby = lobbyUsers[id];
+
+    if (lobby) {
+      const name = lobby.getUserById(id);
+      lobby.removeUserById(id);
+      delete lobbyUsers[id];
+      delete socketUsers[name];
+    }
+  }
+};
 
 /* =============================================================== */
 
@@ -119,6 +132,7 @@ io.on('connection', (socket) => {
       if (!lobby.isFull() && !lobby.hasUser(name)) {
         lobby.addUser(name, socket.id);
         lobbyUsers[socket.id] = lobby;
+        socketUsers[name] = socket.id;
         emitMap(lobby);
 
         break;
@@ -128,8 +142,36 @@ io.on('connection', (socket) => {
 
   socket.on('lobby move', ({ dir }) => {
     const lobby = lobbyUsers[socket.id];
-    lobby.move(socket.id, dir);
-    emitMap(lobby);
+
+    if (lobby) {
+      lobby.move(socket.id, dir);
+      emitMap(lobby);
+    }
+  });
+
+  socket.on('lobby interact', ({ target }) => {
+    const lobby = lobbyUsers[socket.id];
+
+    // Checked on client-side but server should confirm availability
+    if (lobby && lobby.getUserStatus(target) === 'available') {
+      const targetId = socketUsers[target];
+    
+      // io.to(socket.id).emit('lobby wait', { type: 'challenge', target: target });
+      io.to(targetId).emit('challenge request', { from: lobby.getUserById(socket.id) });
+    }
+  });
+
+  socket.on('challenge accept', ({ from }) => {
+    const lobby = lobbyUsers[socket.id];
+    const challenger = socketUsers[from];
+    const opponent = lobby.getUserById(socket.id);
+    const gameId = `${lobby.getLobbyName()}_${from}_VS_${opponent}`.toUpperCase();
+
+    io.to(socket.id).emit('challenge start', { gameId });
+    setTimeout(() => io.to(challenger).emit('challenge start', { gameId }), 420);
+
+    // Sample remove users from lobby
+    removeLobbyUsersById([socket.id, challenger]);
   });
 
   /* socket.on('join game')
