@@ -405,6 +405,15 @@ app.get('/logout', (req, resp) => {
 
 /* =============== WIN / LOSS RESULTS ================= */
 
+app.get('/seriesRecord', (req, resp) => {
+  db.getSeriesRecord(req.query.playerName, req.query.opponentName, function (err, data) {
+    if (err) {
+      resp.status(404).send(err);
+    }
+    resp.status(200).send(JSON.stringify(data));
+  });  
+});
+
 app.get('/gameHistory', (req, resp) => {
   db.getWinLoss(req.query.playerName, function (err, data) {
     if (err) {

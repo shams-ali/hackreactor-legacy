@@ -71,7 +71,9 @@ export default class Game extends Component {
       commandArray: [{ command: 'The game will begin shortly - type \'help\' to learn how to play' }],
       socket: null,
       showGameHistory: false,
-      gameHistoryData: []
+      gameHistoryData: [],
+      numWins: 0,
+      numOpponentWins: 0
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -79,6 +81,7 @@ export default class Game extends Component {
     this.handleCommands = this.handleCommands.bind(this);
     this.getGameHistory = this.getGameHistory.bind(this);
     this.toggleGameHistory = this.toggleGameHistory.bind(this);
+    this.getSeriesRecord = this.getSeriesRecord.bind(this);
 
     // keeps track of the user's terminal commands for easy future use with Up/Down arrow keys
     this.commandList = new commandHistory();
@@ -115,6 +118,7 @@ export default class Game extends Component {
             opponent: data.player1
           });
         }
+        this.getSeriesRecord();
         this.setState({
           commandArray: [{ command: 'Let the battle begin!' }]
         });
@@ -158,13 +162,37 @@ export default class Game extends Component {
     };
   }
 
+  getSeriesRecord() {
+    // Get number of this player's wins against opponent
+    axios(`/seriesRecord?playerName=${this.state.name}&opponentName=${this.state.opponent.name}`)
+      .then((numWins) => {
+        this.setState({ 
+          numWins: numWins.data[0].playerName_wins,
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting series record data:', error);
+      });
+
+    // Get number of this opponent's wins against this player
+    axios(`/seriesRecord?playerName=${this.state.opponent.name}&opponentName=${this.state.name}`)
+      .then((numWins) => {
+        this.setState({ 
+          numOpponentWins: numWins.data[0].playerName_wins
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting series record data:', error);
+      });
+  }
+
   getGameHistory(playerName = this.state.name) {
     axios(`/gameHistory?playerName=${playerName}`)
       .then((gameHistoryData) => {
         this.setState({ gameHistoryData: gameHistoryData.data });
       })
       .catch((error) => {
-        console.log('Error getting Game History: ', error);
+        console.log('Error getting Game History:', error);
       });
   }
 
@@ -444,7 +472,7 @@ export default class Game extends Component {
   renderSideBar() {
     return (
       <div className={css.stateContainer}>
-        <Logo name={this.state.name} isActive={this.state.isActive} opponent={this.state.opponent} toggleGameHistory={this.toggleGameHistory} />
+        <Logo name={this.state.name} isActive={this.state.isActive} opponent={this.state.opponent} toggleGameHistory={this.toggleGameHistory} numWins={this.state.numWins} numOpponentWins={this.state.numOpponentWins} />
         <GameState pokemon={this.state.pokemon} />
         <Chat messageArray={this.state.messageArray} chatInput={this.state.chatInput} handleChatInputSubmit={this.handleChatInputSubmit} handleInputChange={this.handleInputChange} />
       </div>
