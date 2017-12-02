@@ -96,9 +96,7 @@ const saveUser = (username, password, email) =>  {
 };
 
 const savePokemon = (pokemonObj) => {
-  console.log('IN SAVE POKEMON!');
   Pokemon.create(pokemonObj).then((data) => {
-    // console.log('DATA: ', data);
     console.log('POKEMON SAVED TO DB!')
   })
   .catch((err) => {
@@ -126,10 +124,8 @@ const getWinLoss = (playerName, callback) => {
 };
 
 const saveWinLoss = (gameObj, callback) => {
-  console.log('db.js - inside saveWinLoss');
   WinLoss.create(gameObj)
     .then((data) => {
-      console.log('db.js - saveWinLoss - create successful');
       callback(null, data);
     })
     .catch((err) => {
