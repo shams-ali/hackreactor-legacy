@@ -6,7 +6,6 @@ import hist from '../gameHistory.css';
 const GameHistory = (props) => {
   return (
     <div className={hist.container}>
-      <h1 className={hist.header}>Win/Loss Record</h1>
       <div className={hist.gamesList}>
         {props.gameHistoryData.map(game => {
           return (
@@ -14,7 +13,7 @@ const GameHistory = (props) => {
           );
         })}
       </div>
-      <button className={css.gameButton} onClick={function() { props.toggleGameHistory() }}>Close</button>
+      <button className={hist.gameButton} onClick={function() { props.toggleGameHistory() }}>Close</button>
     </div>
   );
 }
