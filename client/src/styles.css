@@ -111,6 +111,7 @@ body {
   padding: 0 10px 20px;
   flex-grow: 1;
   overflow-y: scroll;
+  height: 98px; /* Prevents container from growing too high when loading screen is visible. */ 
 }
 
 .commandInstance {
