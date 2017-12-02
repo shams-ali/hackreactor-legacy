@@ -174,8 +174,8 @@ io.on('connection', (socket) => {
     const opponent = lobby.getUserById(socket.id);
     const gameId = `${lobby.getLobbyName()}_${from}_VS_${opponent}`.toUpperCase();
 
-    io.to(socket.id).emit('challenge start', { gameId });
-    setTimeout(() => io.to(challenger).emit('challenge start', { gameId }), 420);
+    io.to(challenger).emit('challenge start', { gameId });
+    setTimeout(() => io.to(socket.id).emit('challenge start', { gameId }), 420);
 
     // Sample remove users from lobby
     removeLobbyUsersById([socket.id, challenger]);
