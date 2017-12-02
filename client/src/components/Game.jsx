@@ -175,7 +175,8 @@ export default class Game extends Component {
           gameOver: true,
           isActive: false
         });
-        setTimeout(() => this.props.history.replace('/'), 200000);
+        // 30 seconds
+        setTimeout(() => this.props.history.replace('/'), 30000);
       }
     };
   }
@@ -323,8 +324,17 @@ export default class Game extends Component {
         this.setState({
           'commandInput': newInputText
         });
+
+        // Move the cursor to the end of the text input when an old command is brought up
+        // Have to use setTimeout to ensure that this occurs after the commandInput text is set by React
+        setTimeout(() => {
+          const textArea = document.getElementsByTagName('textArea')[0];
+          textArea.selectionStart = textArea.selectionEnd = this.state.commandInput.length;
+        }, 0);
       },
       prevCommand: () => {
+        // since this is triggered by the down arrow key the cursor is already at the end of the text input
+
         let newInputText; // declare here, due to scope
         if (this.state.commandInput === '') { // if the current terminal input text is ''
           const command = this.commandList.getOldCommand();
