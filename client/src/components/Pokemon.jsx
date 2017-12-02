@@ -53,7 +53,7 @@ const Pokemon = (props) => {
     };
   }
 
-  let test = '';
+  let notDead = '';
 
   if (props.isDead) {
     notDead = css.dead;
