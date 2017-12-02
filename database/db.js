@@ -96,9 +96,7 @@ const saveUser = (username, password, email) =>  {
 };
 
 const savePokemon = (pokemonObj) => {
-  console.log('IN SAVE POKEMON!');
   Pokemon.create(pokemonObj).then((data) => {
-    // console.log('DATA: ', data);
     console.log('POKEMON SAVED TO DB!')
   })
   .catch((err) => {
@@ -120,7 +118,7 @@ const getWinLoss = (playerName, callback) => {
       callback(null, gameHistoryData);
     })
     .catch((err) => {
-      console.log('db.js GET GAME HISTORY ERROR: ', err);
+      console.log('GET GAME HISTORY ERROR: ', err);
       callback(err, null);
     });
 };

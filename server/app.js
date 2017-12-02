@@ -237,7 +237,20 @@ io.on('connection', (socket) => {
       ) {
         game[opponent].pokemon[0].health = 0;
         io.to(data.gameid).emit('turn move', game);
-        io.to(data.gameid).emit('gameover', { name: game[player].name });
+        // Save game data
+        let gameObj = {
+          winner_name: game[player].name,
+          winner_pokemon: game[player].pokemon,
+          loser_name: game[opponent].name,
+          loser_pokemon: game[opponent].pokemon
+        };
+        db.saveWinLoss(gameObj, function (err, response) {
+          if (err) {
+            console.log('Save game data error:', err);
+          }
+          // Emit 'gameover' after data has been saved so this lastest game appears in the Game History list immediately
+          io.to(data.gameid).emit('gameover', { name: game[player].name });
+        });
       } else if (game[opponent].pokemon[0].health <= 0) {
         game[opponent].pokemon[0].health = 0;
         game.playerTurn = opponent;
@@ -263,7 +276,20 @@ io.on('connection', (socket) => {
   });
 
   socket.on('seppuku', data => {
-    io.to(data.gameid).emit('gameover', { name: data.name });
+    // Save game data
+    let gameObj = {
+      winner_name: data.winner_name,
+      winner_pokemon: data.winner_pokemon,
+      loser_name: data.loser_name,
+      loser_pokemon: data.loser_pokemon
+    };
+    db.saveWinLoss(gameObj, function (err, response) {
+      if (err) {
+        console.log('Save game data error:', err);
+      }
+      // Emit 'gameover' after data has been saved so this lastest game appears in the Game History list immediately
+      io.to(data.gameid).emit('gameover', { name: data.winner_name });
+    });
   });
 
 });
