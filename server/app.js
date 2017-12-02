@@ -10,6 +10,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const Promise = require('bluebird');
 const db = require('../database/db.js');
+const Sequelize = require('sequelize');
 const bodyParser = require('body-parser');
 const bcrypt = Promise.promisifyAll(require('bcrypt'));
 const saltRounds = 10;
@@ -23,9 +24,15 @@ const Lobby = require('./helpers/Lobby');
 
 const dist = path.join(__dirname, '/../client/dist');
 
+
+
 /* ======================== MIDDLEWARE ======================== */
 
-app.use(bodyParser());
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+// parse application/json
+app.use(bodyParser.json());
+
 app.use(express.static(dist));
 
 app.use(cookieParser());
@@ -155,7 +162,7 @@ io.on('connection', (socket) => {
     // Checked on client-side but server should confirm availability
     if (lobby && lobby.getUserStatus(target) === 'available') {
       const targetId = socketUsers[target];
-    
+
       // io.to(socket.id).emit('lobby wait', { type: 'challenge', target: target });
       io.to(targetId).emit('challenge request', { from: lobby.getUserById(socket.id) });
     }
@@ -304,27 +311,10 @@ app.post('/login', (req, resp) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  // TODO: make username lookup case INsensitive
-  /* Possible example
-    Model.findAll({
-      where: Sequelize.and(
-        "lower(first_name) =lower( 'fred')",
-        { somethingelse: 42}
-      )
-    })
-
-    =>
-
-    db.Users.findOne({
-      where: Sequelize.and(
-        'lower(username) =lower(username)'
-      )
-    })
-    .then ...
-  */
-
-  db.Users
-    .findOne({ where: { username } })
+  db.Users.findOne({
+    // make the username search case INsensitive
+    where: Sequelize.where(Sequelize.fn('lower', Sequelize.col('username')), username.toLowerCase())
+  })
     .then(user => {
       // finds user
       // not found => end resp
@@ -416,7 +406,7 @@ app.get('/logout', (req, resp) => {
 /* =============== WIN / LOSS RESULTS ================= */
 
 app.get('/gameHistory', (req, resp) => {
-  db.getWinLoss(req.query.playerName, function(err, data) {
+  db.getWinLoss(req.query.playerName, function (err, data) {
     if (err) {
       resp.status(404).send(err);
     }
