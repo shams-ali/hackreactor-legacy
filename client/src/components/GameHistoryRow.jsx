@@ -8,7 +8,11 @@ const GameHistoryRow = (props) => {
   return (
     <div className={hist.row}>
       <div className={hist.winLoss}>
-        {props.name === props.game.winner_name ? 'WIN!' : 'Loss'}
+        {props.name === props.game.winner_name ? (
+          <span className={hist.winText}>WIN!</span>
+        ) : (
+          <span className={hist.lossText}>Loss</span>
+        )}
       </div>
 
       <div className={hist.player}>
