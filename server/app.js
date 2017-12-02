@@ -304,6 +304,25 @@ app.post('/login', (req, resp) => {
   const username = req.body.username;
   const password = req.body.password;
 
+  // TODO: make username lookup case INsensitive
+  /* Possible example
+    Model.findAll({
+      where: Sequelize.and(
+        "lower(first_name) =lower( 'fred')",
+        { somethingelse: 42}
+      )
+    })
+
+    =>
+
+    db.Users.findOne({
+      where: Sequelize.and(
+        'lower(username) =lower(username)'
+      )
+    })
+    .then ...
+  */
+
   db.Users
     .findOne({ where: { username } })
     .then(user => {
