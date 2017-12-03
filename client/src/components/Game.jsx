@@ -151,6 +151,7 @@ export default class Game extends Component {
       },
       gameOver: (data) => {
         this.getGameHistory();
+        this.getSeriesRecord();
         this.setState({
           winner: data.name,
           gameOver: true,
