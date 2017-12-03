@@ -164,6 +164,7 @@ io.on('connection', (socket) => {
       const targetId = socketUsers[target];
 
       // io.to(socket.id).emit('lobby wait', { type: 'challenge', target: target });
+      lobby.setUserStatus(lobby.getUserById(socket.id, 'busy'));
       io.to(targetId).emit('challenge request', { from: lobby.getUserById(socket.id) });
     }
   });
@@ -172,10 +173,12 @@ io.on('connection', (socket) => {
     const lobby = lobbyUsers[socket.id];
     const challenger = socketUsers[from];
     const opponent = lobby.getUserById(socket.id);
-    const gameId = `${lobby.getLobbyName()}_${from}_VS_${opponent}`.toUpperCase();
+    const gameId = `${lobby.getLobbyName()}_${from}_VS_${opponent}_${Math.floor(Math.random() * 1000)}`.toUpperCase();
 
-    io.to(socket.id).emit('challenge start', { gameId });
-    setTimeout(() => io.to(challenger).emit('challenge start', { gameId }), 420);
+    lobby.setUserStatus(opponent, 'battling');
+    lobby.setUserStatus(from, 'battling');
+    io.to(challenger).emit('challenge start', { gameId });
+    setTimeout(() => io.to(socket.id).emit('challenge start', { gameId }), 420);
 
     // Sample remove users from lobby
     removeLobbyUsersById([socket.id, challenger]);
