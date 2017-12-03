@@ -10,7 +10,7 @@ const PokemonStats = (props) => {
 
   let healthPoints = {
     'height': '20px',
-    'width': '200px',
+    'width': 'calc(100% - 65px)',
     'background': '#54645E', // grey
     'borderRadius': '20px'
   };
@@ -24,7 +24,7 @@ const PokemonStats = (props) => {
 
   if (damage === 1) {
     healthDamage.borderRadius = '20px';
-  } else if (damage >= 0.95 && damage <= 1) {
+  } else if (damage >= 0.65 && damage <= 1) {
     healthDamage.borderRadius = '20px 0 0 20px';
   } else if (damage >= 0.45 && damage <= 0.65) {
     healthDamage.background = '#F8DE33'; // orange
