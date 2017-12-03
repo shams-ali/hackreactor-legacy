@@ -52,13 +52,28 @@
   border-color: #FFF;
 }
 
-.dead {
-  opacity: 0;
-  animation-name: isAttacked;
-  animation-duration: 2s;
+.attack {
+  animation-name: attack;
+  animation-duration: 1s;
   animation-timing-function: ease;
   animation-iteration-count: once;
-  transition: all 1s linear once;
+}
+
+@keyframes attack {
+  50% {
+    position: absolute;
+    top: -100%;
+    left: 150%;
+    transform: translate(0, 0);
+  }
+}
+
+.isAttacked {
+  opacity: 0;
+  animation-name: isAttacked;
+  animation-duration: 1s;
+  animation-timing-function: ease;
+  animation-iteration-count: once;
 }
 
 @keyframes isAttacked {
@@ -69,15 +84,35 @@
   20% { opacity: 1 }
   25% { opacity: 0 }
   30% { opacity: 1 }
-  40% {
+}
+
+.dead {
+  opacity: 0;
+  animation-name: dead;
+  animation-duration: 2s;
+  animation-timing-function: ease;
+  animation-iteration-count: once;
+}
+
+@keyframes dead {
+  0% { opacity: 1 }
+  5% { opacity: 0 }
+  10% { opacity: 1 }
+  15% { opacity: 0 }
+  20% { opacity: 1 }
+  25% { opacity: 0 }
+  30% { opacity: 1 }
+
+  60% {
     top: 10%;
     transform: translate(-50%, -10%) rotate(90deg);
+    opacity: 1;
   }
 
   80% {
-    top: 100%;
-    transform: translate(-50%, -100%) rotate(90deg);
-  }
+    top: 110%;
+    transform: translate(-50%, -110%) rotate(90deg);
+   }
 
   100% {
     top: 110%;
