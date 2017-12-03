@@ -136,7 +136,14 @@ io.on('connection', (socket) => {
 
   socket.on('join lobby', ({ name }) => {
     for (let lobby of Object.values(lobbies)) {
-      if (!lobby.isFull() && !lobby.hasUser(name)) {
+      if (lobby.hasUser(name)) {
+        lobby.changeUserId(name, socket.id);
+        lobbyUsers[socket.id] = lobby;
+        socketUsers[name] = socket.id;
+        emitMap(lobby);
+        break;
+
+      } else if (!lobby.isFull()) {
         lobby.addUser(name, socket.id);
         lobbyUsers[socket.id] = lobby;
         socketUsers[name] = socket.id;
@@ -164,6 +171,7 @@ io.on('connection', (socket) => {
       const targetId = socketUsers[target];
 
       // io.to(socket.id).emit('lobby wait', { type: 'challenge', target: target });
+      lobby.setUserStatus(lobby.getUserById(socket.id, 'busy'));
       io.to(targetId).emit('challenge request', { from: lobby.getUserById(socket.id) });
     }
   });
@@ -172,10 +180,12 @@ io.on('connection', (socket) => {
     const lobby = lobbyUsers[socket.id];
     const challenger = socketUsers[from];
     const opponent = lobby.getUserById(socket.id);
-    const gameId = `${lobby.getLobbyName()}_${from}_VS_${opponent}`.toUpperCase();
+    const gameId = `${lobby.getLobbyName()}_${from}_VS_${opponent}_${Math.floor(Math.random() * 1000)}`.toUpperCase();
 
-    io.to(socket.id).emit('challenge start', { gameId });
-    setTimeout(() => io.to(challenger).emit('challenge start', { gameId }), 420);
+    lobby.setUserStatus(opponent, 'battling');
+    lobby.setUserStatus(from, 'battling');
+    io.to(challenger).emit('challenge start', { gameId });
+    setTimeout(() => io.to(socket.id).emit('challenge start', { gameId }), 420);
 
     // Sample remove users from lobby
     removeLobbyUsersById([socket.id, challenger]);
@@ -404,6 +414,15 @@ app.get('/logout', (req, resp) => {
 /* =============================================================== */
 
 /* =============== WIN / LOSS RESULTS ================= */
+
+app.get('/seriesRecord', (req, resp) => {
+  db.getSeriesRecord(req.query.playerName, req.query.opponentName, function (err, data) {
+    if (err) {
+      resp.status(404).send(err);
+    }
+    resp.status(200).send(JSON.stringify(data));
+  });  
+});
 
 app.get('/gameHistory', (req, resp) => {
   db.getWinLoss(req.query.playerName, function (err, data) {

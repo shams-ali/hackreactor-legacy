@@ -21,7 +21,8 @@ import { commandHistory } from './../../../utils/commandHistory.js';
 //   Ex. source -> 'attack' does NOT contain the targets -> 'h', 'he', 'hel', or 'help'
 //   Ex. source -> 'help' does NOT contain the targets -> 'c', 'ch', 'cho', 'choo', 'choos', or 'choose'
 const matcher = (target, source) => {
-  if (target.length < 1) { // if the target is an empty string, don't bother searching
+  if ((target === undefined) || (target.length < 1)) { // if the target is either undefined or an empty string,
+    // don't bother searching
     return false;
   } else if (target.length > source.length) { // if the target is longer than the source, it's not a match
     return false;
@@ -31,7 +32,7 @@ const matcher = (target, source) => {
   //   Ex. Scenario: Pokemon array -> ['wigglytuff', 'charzard', 'farfetched']
   //     This stops the command 'choose f' from selecting wigglytuff
   //     Presumably, in this instance the user would prefer to get their farfetchd instead
-  return new RegExp(target).test(source.slice(0, (target.length + 1)));
+  return new RegExp(target).test(source.slice(0, (target.length)));
 };
 
 // A helper function that returns an array of possible matches of pokemon to a string
@@ -71,7 +72,9 @@ export default class Game extends Component {
       commandArray: [{ command: 'The game will begin shortly - type \'help\' to learn how to play' }],
       socket: null,
       showGameHistory: false,
-      gameHistoryData: []
+      gameHistoryData: [],
+      numWins: 0,
+      numOpponentWins: 0
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -79,6 +82,7 @@ export default class Game extends Component {
     this.handleCommands = this.handleCommands.bind(this);
     this.getGameHistory = this.getGameHistory.bind(this);
     this.toggleGameHistory = this.toggleGameHistory.bind(this);
+    this.getSeriesRecord = this.getSeriesRecord.bind(this);
 
     // keeps track of the user's terminal commands for easy future use with Up/Down arrow keys
     this.commandList = new commandHistory();
@@ -115,6 +119,7 @@ export default class Game extends Component {
             opponent: data.player1
           });
         }
+        this.getSeriesRecord();
         this.setState({
           commandArray: [{ command: 'Let the battle begin!' }]
         });
@@ -147,6 +152,7 @@ export default class Game extends Component {
       },
       gameOver: (data) => {
         this.getGameHistory();
+        this.getSeriesRecord();
         this.setState({
           winner: data.name,
           gameOver: true,
@@ -158,13 +164,37 @@ export default class Game extends Component {
     };
   }
 
+  getSeriesRecord() {
+    // Get number of this player's wins against opponent
+    axios(`/seriesRecord?playerName=${this.state.name}&opponentName=${this.state.opponent.name}`)
+      .then((numWins) => {
+        this.setState({ 
+          numWins: numWins.data[0].playerName_wins,
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting series record data:', error);
+      });
+
+    // Get number of this opponent's wins against this player
+    axios(`/seriesRecord?playerName=${this.state.opponent.name}&opponentName=${this.state.name}`)
+      .then((numWins) => {
+        this.setState({ 
+          numOpponentWins: numWins.data[0].playerName_wins
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting series record data:', error);
+      });
+  }
+
   getGameHistory(playerName = this.state.name) {
     axios(`/gameHistory?playerName=${playerName}`)
       .then((gameHistoryData) => {
         this.setState({ gameHistoryData: gameHistoryData.data });
       })
       .catch((error) => {
-        console.log('Error getting Game History: ', error);
+        console.log('Error getting Game History:', error);
       });
   }
 
@@ -250,6 +280,10 @@ export default class Game extends Component {
         });
       },
       choose: (pokemonToSwap) => {
+        if (pokemonToSwap === undefined) {
+          return undefined; // don't add the value undefined as a pokemon
+        }
+
         // add the command to the user's command list history
         this.commandList.addCommand('choose ' + pokemonToSwap);
 
@@ -359,8 +393,18 @@ export default class Game extends Component {
         });
       } else if (matcher(value.split(' ')[0], 'choose')) {
         if (value.split(' ').length > 1) { // if they also have a pokemon name started
+          // find the pokemon that the user chose
+          let thatPokemon = getTeamMatches(this.state.pokemon, value.split(' ')[1])[0];
+
+          if (thatPokemon === undefined) {
+            thatPokemon = ''; // protect against undefined being stated as a pokemon in the command history
+          } else { // insert the space here (in a condition)
+            // this way, if there was nothing after the space, then the space will be ommited
+            thatPokemon = ' ' + thatPokemon;
+          }
+
           this.setState({
-            'commandInput': 'choose ' + getTeamMatches(this.state.pokemon, value.split(' ')[1])[0]
+            'commandInput': 'choose' + thatPokemon
           });
         } else { // just the command 'choose'
           this.setState({
@@ -369,6 +413,7 @@ export default class Game extends Component {
         }
       } else {
         // there is no matching command, so there's nothing to autocomplete
+        console.log('else case');
       }
     }
 
@@ -444,7 +489,7 @@ export default class Game extends Component {
   renderSideBar() {
     return (
       <div className={css.stateContainer}>
-        <Logo name={this.state.name} isActive={this.state.isActive} opponent={this.state.opponent} toggleGameHistory={this.toggleGameHistory} />
+        <Logo name={this.state.name} isActive={this.state.isActive} opponent={this.state.opponent} toggleGameHistory={this.toggleGameHistory} numWins={this.state.numWins} numOpponentWins={this.state.numOpponentWins} />
         <GameState pokemon={this.state.pokemon} />
         <Chat messageArray={this.state.messageArray} chatInput={this.state.chatInput} handleChatInputSubmit={this.handleChatInputSubmit} handleInputChange={this.handleInputChange} />
       </div>

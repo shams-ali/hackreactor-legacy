@@ -57,6 +57,14 @@ body {
   margin-top: 0;
 }
 
+.opponents {
+  margin-bottom: 0;
+}
+
+.record {
+  font-size: 0.75rem;
+}
+
 .messageInstance {
   padding: 7px 0;
 }
