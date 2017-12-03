@@ -44,6 +44,11 @@ class Lobby {
     }
   }
 
+  changeUserId(name, id) {
+    // TODO: remove old id
+    this.ids[id] = name;
+  }
+
   setUserStatus(name, status = 'available') {
     if (this.users[name] && new Set(['available', 'battling']).has(status)) {
       this.users[name].status = status;

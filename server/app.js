@@ -136,7 +136,14 @@ io.on('connection', (socket) => {
 
   socket.on('join lobby', ({ name }) => {
     for (let lobby of Object.values(lobbies)) {
-      if (!lobby.isFull() && !lobby.hasUser(name)) {
+      if (lobby.hasUser(name)) {
+        lobby.changeUserId(name, socket.id);
+        lobbyUsers[socket.id] = lobby;
+        socketUsers[name] = socket.id;
+        emitMap(lobby);
+        break;
+
+      } else if (!lobby.isFull()) {
         lobby.addUser(name, socket.id);
         lobbyUsers[socket.id] = lobby;
         socketUsers[name] = socket.id;
