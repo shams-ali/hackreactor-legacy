@@ -21,7 +21,8 @@ import { commandHistory } from './../../../utils/commandHistory.js';
 //   Ex. source -> 'attack' does NOT contain the targets -> 'h', 'he', 'hel', or 'help'
 //   Ex. source -> 'help' does NOT contain the targets -> 'c', 'ch', 'cho', 'choo', 'choos', or 'choose'
 const matcher = (target, source) => {
-  if (target.length < 1) { // if the target is an empty string, don't bother searching
+  if ((target === undefined) || (target.length < 1)) { // if the target is either undefined or an empty string,
+    // don't bother searching
     return false;
   } else if (target.length > source.length) { // if the target is longer than the source, it's not a match
     return false;
@@ -31,7 +32,7 @@ const matcher = (target, source) => {
   //   Ex. Scenario: Pokemon array -> ['wigglytuff', 'charzard', 'farfetched']
   //     This stops the command 'choose f' from selecting wigglytuff
   //     Presumably, in this instance the user would prefer to get their farfetchd instead
-  return new RegExp(target).test(source.slice(0, (target.length + 1)));
+  return new RegExp(target).test(source.slice(0, (target.length)));
 };
 
 // A helper function that returns an array of possible matches of pokemon to a string
@@ -279,6 +280,10 @@ export default class Game extends Component {
         });
       },
       choose: (pokemonToSwap) => {
+        if (pokemonToSwap === undefined) {
+          return undefined; // don't add the value undefined as a pokemon
+        }
+
         // add the command to the user's command list history
         this.commandList.addCommand('choose ' + pokemonToSwap);
 
@@ -388,8 +393,18 @@ export default class Game extends Component {
         });
       } else if (matcher(value.split(' ')[0], 'choose')) {
         if (value.split(' ').length > 1) { // if they also have a pokemon name started
+          // find the pokemon that the user chose
+          let thatPokemon = getTeamMatches(this.state.pokemon, value.split(' ')[1])[0];
+
+          if (thatPokemon === undefined) {
+            thatPokemon = ''; // protect against undefined being stated as a pokemon in the command history
+          } else { // insert the space here (in a condition)
+            // this way, if there was nothing after the space, then the space will be ommited
+            thatPokemon = ' ' + thatPokemon;
+          }
+
           this.setState({
-            'commandInput': 'choose ' + getTeamMatches(this.state.pokemon, value.split(' ')[1])[0]
+            'commandInput': 'choose' + thatPokemon
           });
         } else { // just the command 'choose'
           this.setState({
@@ -398,6 +413,7 @@ export default class Game extends Component {
         }
       } else {
         // there is no matching command, so there's nothing to autocomplete
+        console.log('else case');
       }
     }
 
