@@ -1,9 +1,11 @@
 import React, { Component, } from 'react';
+import { Link, } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
 
 import Avatar from './Avatar.jsx';
 import styles from '../lobby.css';
+import css from '../styles.css';
 
 export default class Lobby extends Component {
   constructor(props) {
@@ -26,7 +28,6 @@ export default class Lobby extends Component {
           const { username } = data;
           const socket = io();
 
-          // socket must be assigned before handleKeydown is useful
           document.addEventListener('keydown', this.handleKeydown.bind(this));
 
           this.setState({
@@ -127,6 +128,15 @@ export default class Lobby extends Component {
     });
   }
 
+  handleGoHome() {
+    axios('/welcome');
+  }
+
+  handleLogout() {
+    console.log('handle logout');
+    axios('/logout');
+  }
+
   handleLobbyToGame({ gameId }) {
     this.props.history.replace(`/game/${gameId}`);
   }
@@ -135,26 +145,38 @@ export default class Lobby extends Component {
     const { users, map } = this.state;
 
     return (
-      <div className={styles.lobby}>
-        {map.map((row, rowId) => (
-          <div key={rowId} className={styles.row}>
-            {row.map((col, colId) => (
-              <div key={colId} className={styles.grass}></div>
-            ))}
+      <div>
+        <div className={css.navBar}>
+          <div className={css.logo}>Chattermon</div>
+          <div className={css.navBarLinksContainer}>
+            <div className={css.navBarLink} onClick={this.handleGoHome}><Link to={'/login'} className={css.navBarLinkA}>Home</Link></div>
+            <div className={css.navBarLink} onClick={this.handleLogout}><Link to={'/login'} className={css.navBarLinkA}>Logout</Link></div>
           </div>
-        ))}
+        </div>
 
-        {Object.entries(users).map(([ name, data ]) => {
-          const { position, direction } = data;
-          const style = {
-            left: position[1] * 48,
-            top: position[0] * 48,
-          };
+        <br />
 
-          return (
-            <Avatar name={name} style={style} direction={direction} />
-          );
-        })}
+        <div className={styles.lobby}>
+          {map.map((row, rowId) => (
+            <div key={rowId} className={styles.row}>
+              {row.map((col, colId) => (
+                <div key={colId} className={styles.grass}></div>
+              ))}
+            </div>
+          ))}
+
+          {Object.entries(users).map(([ name, data ]) => {
+            const { position, direction } = data;
+            const style = {
+              left: position[1] * 48,
+              top: position[0] * 48,
+            };
+
+            return (
+              <Avatar name={name} style={style} direction={direction} />
+            );
+          })}
+        </div>
       </div>
     );
   }
