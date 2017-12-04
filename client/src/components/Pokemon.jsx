@@ -43,16 +43,25 @@ const Pokemon = (props) => {
       } else if (type === 'electric') {
         attackImg = '/img/attack-electric.png';
       } else if (type === 'bug' || type === 'grass') {
-      } else if (type === 'ground' || type === 'rock') {
+        attackImg = '/img/attack-grass_bug.png';
       } else if (type === 'dragon') {
+        attackImg = '/img/attack-dragon.png';
+      } else if (type === 'ground' || type === 'rock') {
+        attackImg = '/img/attack-ground.png';
       } else if (type === 'fighting') {
+        attackImg = '/img/attack-fighting.png';
       } else if (type === 'fire') {
-      } else if (type === 'flying') {
-      } else if (type === 'ghost') {
+        attackImg = '/img/attack-fire.png';
+      } else if (type === 'flying' || type === 'ghost') {
+        attackImg = '/img/attack-flying_ghost.png';
       } else if (type === 'ice') {
+        attackImg = '/img/attack-ice.png';
       } else if (type === 'poison') {
+        attackImg = '/img/attack-poison.png';
       } else if (type === 'psychic') {
+        attackImg = '/img/attack-psychic.png';
       } else if (type === 'normal') {
+        attackImg = '/img/attack-normal.png';
       }
       attack = css.attack;
     });
