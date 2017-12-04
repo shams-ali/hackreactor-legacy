@@ -19,30 +19,22 @@ const PokemonStats = (props) => {
     'height': '20px',
     'width': `${damage * 100}%`,
     'background': '#6EF9A8', // green
-    'transition': 'all 2s ease'
   };
 
   if (damage === 1) {
     healthDamage.borderRadius = '20px';
-  } else if (damage >= 0.65 && damage <= 1) {
+  } else if (damage >= 0.65 && damage <= 0.95) {
     healthDamage.borderRadius = '20px 0 0 20px';
+    healthDamage.transition = 'all 2s ease';
   } else if (damage >= 0.45 && damage <= 0.65) {
     healthDamage.background = '#F8DE33'; // orange
     healthDamage.transition = 'all 1s ease';
     healthDamage.borderRadius = '20px 0 0 20px';
   } else if (damage >= 0 && damage <= 0.45) {
     healthDamage.background = '#FB4F43'; // red
-    healthDamage.transition = 'all 0.25s ease';
+    healthDamage.transition = 'all 0.5s ease';
     healthDamage.borderRadius = '20px 0 0 20px';
   }
-
-  let pokemonTypes = props.stats.types;
-
-  // pokemonTypes.forEach((type, index) => {
-  //   if (type) {
-  //     console.log('POKEMON TYPE HERE => ', type);
-  //   }
-  // });
 
   return (
     <div className={css.stats}>
@@ -55,12 +47,7 @@ const PokemonStats = (props) => {
           <div className={css.healthDamage} style={healthDamage}></div>
         </div>
       </div>
-
-<<<<<<< HEAD
-      <div style={{marginBottom: '2px'}}> {props.stats.health} / {props.stats.initialHealth} </div>
-=======
       <div>{props.stats.health} / {props.stats.initialHealth}</div>
->>>>>>> 4dcd8a2c735a75c535f7d87752155933ecc17078
     </div>
   );
 };

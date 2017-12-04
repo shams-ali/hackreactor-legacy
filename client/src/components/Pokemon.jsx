@@ -2,11 +2,19 @@ import React from 'react';
 import css from '../PokemonStats.css';
 
 const Pokemon = (props) => {
+  let notDead = '';
+  let attack = '';
+  let attackImg = '';
+  let attackType = {
+    'position': 'absolute',
+    'top': '50%',
+    'left': '50%',
+    'transform': 'translate(-50%, -50%)'
+  };
+
   const containerPokemon = {
     position: 'relative'
   };
-
-  const fainted = `${props.health === 0}`;
 
   let sprite = {
     'position': 'absolute',
@@ -28,12 +36,36 @@ const Pokemon = (props) => {
 
   if (props.attacking) {
     sprite.paddingLeft = '30px';
-    sprite.transition = 'all 0.1s ease-out';
+
+    props.types.forEach((type, index) => {
+      if (type === 'water') {
+        attackImg = '/img/attack-water.png';
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      } else if (type === '') {
+      }
+      attack = css.attack;
+    });
+  } else if (props.isAttacked) {
+    notDead = css.isAttacked;
   }
 
-  if (props.isAttacked) {
-    sprite.opacity = '0.3';
-    sprite.transition = 'all 0.1s linear';
+  if (props.isDead) {
+    notDead = css.dead;
   }
 
   if (props.gameOver) {
@@ -53,15 +85,10 @@ const Pokemon = (props) => {
     };
   }
 
-  let notDead = '';
-
-  if (props.isDead) {
-    notDead = css.dead;
-  }
-
   return (
     <div style={containerPokemon}>
       <img style={bkgd} src="/img/bkgd-battle.png"/>
+      <img className={attack} style={attackType} src={attackImg}/>
       <img className={notDead} style={sprite} src={props.sprite}/>
     </div>
   );
