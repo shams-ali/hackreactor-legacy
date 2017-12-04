@@ -1,6 +1,6 @@
 const ROOM_CAPACITY = process.env.ROOM_CAPACITY || 6;
-const ROOM_WIDTH = process.env.ROOM_WIDTH || 10;
-const ROOM_HEIGHT = process.env.ROOM_HEIGHT || 10;
+const ROOM_WIDTH = process.env.ROOM_WIDTH || 16;
+const ROOM_HEIGHT = process.env.ROOM_HEIGHT || 9;
 
 class Lobby {
   constructor(name) {
@@ -42,6 +42,11 @@ class Lobby {
     if (this.users[name]) {
       return this.users[name].status;
     }
+  }
+
+  changeUserId(name, id) {
+    // TODO: remove old id
+    this.ids[id] = name;
   }
 
   setUserStatus(name, status = 'available') {

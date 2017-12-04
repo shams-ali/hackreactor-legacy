@@ -110,6 +110,24 @@ const savePokemon = (pokemonObj) => {
     });
 };
 
+const getSeriesRecord = (playerName, opponentName, callback) => {
+  WinLoss.findAll({
+    raw: true,
+    attributes: [[sequelize.fn('COUNT', sequelize.col('winner_name')), 'playerName_wins']],
+    where: {
+      winner_name: playerName,
+      loser_name: opponentName
+    }
+  })
+    .then((numWins) => {
+      callback(null, numWins);
+    })
+    .catch((err) => {
+      console.log('GET SERIES RECORD ERROR: ', err);
+      callback(err, null);
+    });
+};
+
 const getWinLoss = (playerName, callback) => {
   WinLoss.findAll({
     raw: true,
@@ -143,6 +161,7 @@ const saveWinLoss = (gameObj, callback) => {
 module.exports = {
   connecttion: sequelize,
   saveUser: saveUser,
+  getSeriesRecord: getSeriesRecord,
   getWinLoss: getWinLoss,
   saveWinLoss: saveWinLoss,
   Users: Users,

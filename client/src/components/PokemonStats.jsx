@@ -10,7 +10,7 @@ const PokemonStats = (props) => {
 
   let healthPoints = {
     'height': '20px',
-    'width': '200px',
+    'width': 'calc(100% - 65px)',
     'background': '#54645E', // grey
     'borderRadius': '20px'
   };
