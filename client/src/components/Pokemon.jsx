@@ -40,23 +40,19 @@ const Pokemon = (props) => {
     props.types.forEach((type, index) => {
       if (type === 'water') {
         attackImg = '/img/attack-water.png';
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
-      } else if (type === '') {
+      } else if (type === 'electric') {
+        attackImg = '/img/attack-electric.png';
+      } else if (type === 'bug' || type === 'grass') {
+      } else if (type === 'ground' || type === 'rock') {
+      } else if (type === 'dragon') {
+      } else if (type === 'fighting') {
+      } else if (type === 'fire') {
+      } else if (type === 'flying') {
+      } else if (type === 'ghost') {
+      } else if (type === 'ice') {
+      } else if (type === 'poison') {
+      } else if (type === 'psychic') {
+      } else if (type === 'normal') {
       }
       attack = css.attack;
     });
